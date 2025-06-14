@@ -1,11 +1,10 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AuthPage } from "@/components/auth/AuthPage";
-import { LibraryDashboard } from "@/components/library/LibraryDashboard";
+import { LibraryDashboard } from "@/components/library/LibraryDashboard.jsx";
 
 const queryClient = new QueryClient();
 

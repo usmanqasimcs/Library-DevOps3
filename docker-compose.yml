@@ -5,9 +5,10 @@ services:
   client:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.client
       args:
         - VITE_API_URL=/api
+    image: usmanqasim7/library-client:latest
     ports:
       - "4000:80"
     depends_on:
@@ -17,8 +18,9 @@ services:
 
   server:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.server
+    image: usmanqasim7/library-server:latest
     ports:
       - "6000:5000"
     environment:
