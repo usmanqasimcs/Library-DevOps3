@@ -441,28 +441,29 @@ export const LibraryDashboard = () => {
         <div className="space-y-8">
           {/* Statistics Cards */}
           <div
-            className="grid grid-cols-4 gap-2 w-full"
+            className="flex gap-2 w-full overflow-x-auto pb-2"
             data-testid="stats-section"
+            style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            <Card>
+            <Card className="min-w-[200px] flex-1">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-gray-900 truncate" data-testid="total-books">{stats.total}</div>
                 <div className="text-xs text-gray-600 truncate">Total Books</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="min-w-[200px] flex-1">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-blue-600 truncate" data-testid="reading-books">{stats.reading}</div>
                 <div className="text-xs text-gray-600 truncate">Currently Reading</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="min-w-[200px] flex-1">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-green-600 truncate" data-testid="finished-books">{stats.finished}</div>
                 <div className="text-xs text-gray-600 truncate">Finished</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="min-w-[200px] flex-1">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-gray-600 truncate" data-testid="unread-books">{stats.notRead}</div>
                 <div className="text-xs text-gray-600 truncate">Not Read</div>
