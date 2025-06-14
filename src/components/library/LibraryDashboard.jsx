@@ -425,7 +425,7 @@ export const LibraryDashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">My Library</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600" data-testid="welcome-message">Welcome, {user?.name || 'User'}</span>
+              <span className="text-sm text-gray-600" data-testid="welcome-message">Welcome ! </span>
               <Button variant="outline" onClick={logout} data-testid="logout-button">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
