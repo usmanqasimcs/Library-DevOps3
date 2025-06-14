@@ -3,16 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Book } from '@/types/book';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
 import { LogOut, Library, Plus, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
-export const LibraryDashboard: React.FC = () => {
-  const [books, setBooks] = useState<Book[]>([]);
+export const LibraryDashboard = () => {
+  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedBookId, setExpandedBookId] = useState<string | null>(null);
+  const [expandedBookId, setExpandedBookId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const { user, logout } = useAuth();
 
@@ -20,7 +19,7 @@ export const LibraryDashboard: React.FC = () => {
   const [newBook, setNewBook] = useState({
     title: '',
     author: '',
-    status: 'not-read' as Book['status'],
+    status: 'not-read',
     genre: '',
     publicationYear: '',
     pages: ''
@@ -49,7 +48,7 @@ export const LibraryDashboard: React.FC = () => {
     }
   };
 
-  const handleAddBook = async (e: React.FormEvent) => {
+  const handleAddBook = async (e) => {
     e.preventDefault();
     if (!newBook.title.trim() || !newBook.author.trim()) {
       toast({ 
@@ -94,7 +93,7 @@ export const LibraryDashboard: React.FC = () => {
     }
   };
 
-  const handleDeleteBook = async (id: string) => {
+  const handleDeleteBook = async (id) => {
     try {
       console.log('Deleting book:', id);
       await apiService.deleteBook(id);
@@ -112,11 +111,11 @@ export const LibraryDashboard: React.FC = () => {
     }
   };
 
-  const toggleBookDetails = (id: string) => {
+  const toggleBookDetails = (id) => {
     setExpandedBookId(expandedBookId === id ? null : id);
   };
 
-  const getStatusColor = (status: Book['status']) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case 'reading':
         return 'bg-blue-100 text-blue-800';
@@ -226,7 +225,7 @@ export const LibraryDashboard: React.FC = () => {
                       <select
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         value={newBook.status}
-                        onChange={(e) => setNewBook({...newBook, status: e.target.value as Book['status']})}
+                        onChange={(e) => setNewBook({...newBook, status: e.target.value})}
                       >
                         <option value="not-read">Not Read</option>
                         <option value="reading">Reading</option>
@@ -270,7 +269,7 @@ export const LibraryDashboard: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => toggleBookDetails(book._id!)}
+                            onClick={() => toggleBookDetails(book._id)}
                           >
                             {expandedBookId === book._id ? (
                               <>
@@ -287,7 +286,7 @@ export const LibraryDashboard: React.FC = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => handleDeleteBook(book._id!)}
+                            onClick={() => handleDeleteBook(book._id)}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -300,15 +299,15 @@ export const LibraryDashboard: React.FC = () => {
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
                               <span className="font-medium text-gray-600">Genre:</span>
-                              <p>{(book as any).genre || 'N/A'}</p>
+                              <p>{book.genre || 'N/A'}</p>
                             </div>
                             <div>
                               <span className="font-medium text-gray-600">Publication Year:</span>
-                              <p>{(book as any).publicationYear || 'N/A'}</p>
+                              <p>{book.publicationYear || 'N/A'}</p>
                             </div>
                             <div>
                               <span className="font-medium text-gray-600">Pages:</span>
-                              <p>{(book as any).pages || 'N/A'}</p>
+                              <p>{book.pages || 'N/A'}</p>
                             </div>
                             <div>
                               <span className="font-medium text-gray-600">Status:</span>
