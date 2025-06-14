@@ -1,3 +1,4 @@
+
 import { Book } from '@/types/book';
 
 // Use environment variable or fallback based on environment
@@ -51,7 +52,22 @@ class ApiService {
     
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        // If not JSON, get text and try to parse
+        const text = await response.text();
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { error: text || 'Non-JSON response received' };
+        }
+      }
       
       console.log(`Response from ${url}:`, { 
         status: response.status, 
