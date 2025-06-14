@@ -31,16 +31,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('Checking for existing token:', token);
     if (token) {
-      // In a real app, you'd verify the token with the server
+      // For now, set a demo user when token exists
+      // In production, you should verify the token with the server
       setUser({ _id: '1', email: 'user@example.com', name: 'Demo User' });
+      console.log('User set from token');
     }
     setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('Attempting login with:', { email });
       const response = await apiService.login(email, password);
+      console.log('Login response:', response);
       setUser(response.user);
     } catch (error) {
       console.error('Login failed:', error);
@@ -50,7 +55,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (name: string, email: string, password: string) => {
     try {
+      console.log('Attempting registration with:', { name, email });
       const response = await apiService.register(name, email, password);
+      console.log('Registration response:', response);
       setUser(response.user);
     } catch (error) {
       console.error('Registration failed:', error);
@@ -59,6 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    console.log('Logging out user');
     apiService.logout();
     setUser(null);
   };
