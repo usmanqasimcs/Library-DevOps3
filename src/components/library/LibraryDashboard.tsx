@@ -20,37 +20,37 @@ export const LibraryDashboard: React.FC = () => {
   }, []);
 
   const loadBooks = async () => {
+    setLoading(true);
     try {
-      // For demo purposes, using localStorage
-      const savedBooks = localStorage.getItem('books');
-      if (savedBooks) {
-        setBooks(JSON.parse(savedBooks));
-      }
+      console.log('Loading books from API...');
+      const booksData = await apiService.getBooks();
+      console.log('Books loaded:', booksData);
+      setBooks(booksData);
     } catch (error) {
       console.error('Failed to load books:', error);
+      toast({ 
+        title: 'Failed to load books', 
+        description: 'Please try refreshing the page',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const saveBooks = (updatedBooks: Book[]) => {
-    localStorage.setItem('books', JSON.stringify(updatedBooks));
-    setBooks(updatedBooks);
   };
 
   const handleAddBook = async (newBook: Omit<Book, '_id'>) => {
     setLoading(true);
     try {
-      const bookWithId = {
-        ...newBook,
-        _id: Date.now().toString(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      const updatedBooks = [...books, bookWithId];
-      saveBooks(updatedBooks);
+      console.log('Adding book to API:', newBook);
+      const createdBook = await apiService.createBook(newBook);
+      console.log('Book created:', createdBook);
+      setBooks(prevBooks => [...prevBooks, createdBook]);
       toast({ title: 'Book added successfully!' });
     } catch (error) {
+      console.error('Failed to add book:', error);
       toast({ 
         title: 'Failed to add book', 
+        description: 'Please try again',
         variant: 'destructive'
       });
     } finally {
@@ -60,14 +60,20 @@ export const LibraryDashboard: React.FC = () => {
 
   const handleStatusChange = async (id: string, status: Book['status']) => {
     try {
-      const updatedBooks = books.map(book =>
-        book._id === id ? { ...book, status, updatedAt: new Date() } : book
+      console.log('Updating book status:', { id, status });
+      const updatedBook = await apiService.updateBook(id, { status });
+      console.log('Book status updated:', updatedBook);
+      setBooks(prevBooks => 
+        prevBooks.map(book => 
+          book._id === id ? { ...book, status } : book
+        )
       );
-      saveBooks(updatedBooks);
       toast({ title: 'Book status updated!' });
     } catch (error) {
+      console.error('Failed to update status:', error);
       toast({ 
         title: 'Failed to update status', 
+        description: 'Please try again',
         variant: 'destructive'
       });
     }
@@ -75,12 +81,16 @@ export const LibraryDashboard: React.FC = () => {
 
   const handleDeleteBook = async (id: string) => {
     try {
-      const updatedBooks = books.filter(book => book._id !== id);
-      saveBooks(updatedBooks);
+      console.log('Deleting book:', id);
+      await apiService.deleteBook(id);
+      console.log('Book deleted successfully');
+      setBooks(prevBooks => prevBooks.filter(book => book._id !== id));
       toast({ title: 'Book deleted successfully!' });
     } catch (error) {
+      console.error('Failed to delete book:', error);
       toast({ 
         title: 'Failed to delete book', 
+        description: 'Please try again',
         variant: 'destructive'
       });
     }
@@ -89,6 +99,14 @@ export const LibraryDashboard: React.FC = () => {
   const notReadBooks = books.filter(book => book.status === 'not-read');
   const readingBooks = books.filter(book => book.status === 'reading');
   const finishedBooks = books.filter(book => book.status === 'finished');
+
+  if (loading && books.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading your library...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
