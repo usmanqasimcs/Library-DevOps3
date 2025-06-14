@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Book } from '@/types/book';
 
@@ -15,14 +14,22 @@ interface AddBookFormProps {
 export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
+  const [publicationYear, setPublicationYear] = useState<number | ''>('');
   const [status, setStatus] = useState<Book['status']>('not-read');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim() && author.trim()) {
-      onAddBook({ title: title.trim(), author: author.trim(), status });
+      const book: Omit<Book, '_id'> = {
+        title: title.trim(),
+        author: author.trim(),
+        status,
+        publicationYear: publicationYear === '' ? undefined : Number(publicationYear),
+      };
+      onAddBook(book);
       setTitle('');
       setAuthor('');
+      setPublicationYear('');
       setStatus('not-read');
     }
   };
@@ -55,19 +62,31 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="publicationYear">Publication Year</Label>
+              <Input
+                id="publicationYear"
+                type="number"
+                inputMode="numeric"
+                value={publicationYear}
+                onChange={(e) => setPublicationYear(e.target.value ? Number(e.target.value) : '')}
+                placeholder="e.g. 2020"
+                min={0}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={(value) => setStatus(value as Book['status'])}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not-read">Not Read</SelectItem>
-                <SelectItem value="reading">Reading</SelectItem>
-                <SelectItem value="finished">Finished</SelectItem>
-              </SelectContent>
-            </Select>
+            <select
+              id="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as Book['status'])}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            >
+              <option value="not-read">Not Read</option>
+              <option value="reading">Reading</option>
+              <option value="finished">Finished</option>
+            </select>
           </div>
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? 'Adding...' : 'Add Book'}

@@ -403,33 +403,9 @@ export const LibraryDashboard = () => {
                       type="number"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       value={editingBook.publicationYear || ''}
-                      onChange={(e) => setEditingBook({...editingBook, publicationYear: parseInt(e.target.value)})}
+                      onChange={(e) => setEditingBook({...editingBook, publicationYear: parseInt(e.target.value) || ''})}
                       placeholder="Enter year"
                       data-testid="edit-year-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Pages</label>
-                    <input
-                      type="number"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      value={editingBook.pages || ''}
-                      onChange={(e) => setEditingBook({...editingBook, pages: parseInt(e.target.value)})}
-                      placeholder="Number of pages"
-                      data-testid="edit-pages-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Rating (1-5)</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      value={editingBook.rating || ''}
-                      onChange={(e) => setEditingBook({...editingBook, rating: parseInt(e.target.value)})}
-                      placeholder="Rate 1-5"
-                      data-testid="edit-rating-input"
                     />
                   </div>
                 </div>
@@ -456,20 +432,10 @@ export const LibraryDashboard = () => {
                     <p data-testid="book-year">{book.publicationYear || 'N/A'}</p>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">Pages:</span>
-                    <p data-testid="book-pages">{book.pages || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Rating:</span>
-                    <p data-testid="book-rating-detail">{book.rating ? `★ ${book.rating}/5` : 'N/A'}</p>
+                    <span className="font-medium text-gray-600">Notes:</span>
+                    <p className="mt-1 text-sm" data-testid="book-notes">{book.notes || 'N/A'}</p>
                   </div>
                 </div>
-                {book.notes && (
-                  <div className="mt-4">
-                    <span className="font-medium text-gray-600">Notes:</span>
-                    <p className="mt-1 text-sm" data-testid="book-notes">{book.notes}</p>
-                  </div>
-                )}
               </div>
             )}
           </CardContent>
