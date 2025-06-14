@@ -408,6 +408,14 @@ export const LibraryDashboard = () => {
     </Card>
   );
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" data-testid="loading-screen">
+        <div className="text-lg">Loading your library...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50" data-testid="library-dashboard">
       <header className="bg-white shadow-sm border-b">
@@ -418,7 +426,7 @@ export const LibraryDashboard = () => {
               <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">My Library</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600" data-testid="welcome-message">Welcome, {user?.name}</span>
+              <span className="text-sm text-gray-600" data-testid="welcome-message">Welcome, {user?.name || 'User'}</span>
               <Button variant="outline" onClick={logout} data-testid="logout-button">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -431,7 +439,7 @@ export const LibraryDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4" data-testid="stats-section">
+          <div className="grid grid-cols-4 gap-4" data-testid="stats-section">
             <Card>
               <CardContent className="p-4">
                 <div className="text-2xl font-bold text-gray-900" data-testid="total-books">{stats.total}</div>
