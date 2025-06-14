@@ -441,26 +441,30 @@ export const LibraryDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Statistics Cards */}
-          <div className="grid grid-cols-4 gap-2 min-w-0" data-testid="stats-section">
-            <Card className="min-w-0">
+          <div
+            className="flex gap-2 overflow-x-auto pb-2"
+            data-testid="stats-section"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            <Card className="min-w-[180px] flex-shrink-0">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-gray-900 truncate" data-testid="total-books">{stats.total}</div>
                 <div className="text-xs text-gray-600 truncate">Total Books</div>
               </CardContent>
             </Card>
-            <Card className="min-w-0">
+            <Card className="min-w-[180px] flex-shrink-0">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-blue-600 truncate" data-testid="reading-books">{stats.reading}</div>
                 <div className="text-xs text-gray-600 truncate">Currently Reading</div>
               </CardContent>
             </Card>
-            <Card className="min-w-0">
+            <Card className="min-w-[180px] flex-shrink-0">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-green-600 truncate" data-testid="finished-books">{stats.finished}</div>
                 <div className="text-xs text-gray-600 truncate">Finished</div>
               </CardContent>
             </Card>
-            <Card className="min-w-0">
+            <Card className="min-w-[180px] flex-shrink-0">
               <CardContent className="p-2 text-center">
                 <div className="text-lg font-bold text-gray-600 truncate" data-testid="unread-books">{stats.notRead}</div>
                 <div className="text-xs text-gray-600 truncate">Not Read</div>
