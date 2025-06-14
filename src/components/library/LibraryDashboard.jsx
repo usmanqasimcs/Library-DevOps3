@@ -14,8 +14,8 @@ import { AddBookSection } from "./AddBookSection";
 import { BooksSection } from "./BooksSection";
 
 export const LibraryDashboard = () => {
-  const [books, setBooks] = useState([]);
-  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [books, setBooks] = useState([]); // always an array
+  const [filteredBooks, setFilteredBooks] = useState([]); // always an array
   const [loading, setLoading] = useState(true);
   const [expandedBookId, setExpandedBookId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -45,7 +45,7 @@ export const LibraryDashboard = () => {
   }, [books, searchTerm, sortBy, favoriteBookIds]);
 
   const filterAndSortBooks = () => {
-    let filtered = [...books];
+    let filtered = Array.isArray(books) ? [...books] : [];
     
     // Apply search filter
     if (searchTerm && searchTerm.trim() !== '') {
@@ -79,8 +79,10 @@ export const LibraryDashboard = () => {
     try {
       console.log('Loading books from API...');
       const booksData = await apiService.getBooks();
-      console.log('Books loaded:', booksData);
-      setBooks(booksData);
+      // Ensure booksData is always an array
+      const arrayData = Array.isArray(booksData) ? booksData : [];
+      console.log('Books loaded:', arrayData);
+      setBooks(arrayData);
     } catch (error) {
       console.error('Failed to load books:', error);
       toast({ 
@@ -210,8 +212,10 @@ export const LibraryDashboard = () => {
   };
 
   const getBooksByStatus = (status) => {
+    // Defensive: Ensure filteredBooks is an array
+    const list = Array.isArray(filteredBooks) ? filteredBooks : [];
     // Always place favorite books at the top within each status section
-    const booksInStatus = filteredBooks.filter(book => book.status === status);
+    const booksInStatus = list.filter(book => book.status === status);
     return [
       ...booksInStatus.filter(book => favoriteBookIds.has(book._id)),
       ...booksInStatus.filter(book => !favoriteBookIds.has(book._id)),
