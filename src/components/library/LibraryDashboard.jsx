@@ -441,29 +441,29 @@ export const LibraryDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Statistics Cards */}
-          <div className="grid grid-cols-4 gap-4" data-testid="stats-section">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-gray-900" data-testid="total-books">{stats.total}</div>
-                <div className="text-sm text-gray-600">Total Books</div>
+          <div className="grid grid-cols-4 gap-2 min-w-0" data-testid="stats-section">
+            <Card className="min-w-0">
+              <CardContent className="p-2 text-center">
+                <div className="text-lg font-bold text-gray-900 truncate" data-testid="total-books">{stats.total}</div>
+                <div className="text-xs text-gray-600 truncate">Total Books</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600" data-testid="reading-books">{stats.reading}</div>
-                <div className="text-sm text-gray-600">Currently Reading</div>
+            <Card className="min-w-0">
+              <CardContent className="p-2 text-center">
+                <div className="text-lg font-bold text-blue-600 truncate" data-testid="reading-books">{stats.reading}</div>
+                <div className="text-xs text-gray-600 truncate">Currently Reading</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600" data-testid="finished-books">{stats.finished}</div>
-                <div className="text-sm text-gray-600">Finished</div>
+            <Card className="min-w-0">
+              <CardContent className="p-2 text-center">
+                <div className="text-lg font-bold text-green-600 truncate" data-testid="finished-books">{stats.finished}</div>
+                <div className="text-xs text-gray-600 truncate">Finished</div>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-gray-600" data-testid="unread-books">{stats.notRead}</div>
-                <div className="text-sm text-gray-600">Not Read</div>
+            <Card className="min-w-0">
+              <CardContent className="p-2 text-center">
+                <div className="text-lg font-bold text-gray-600 truncate" data-testid="unread-books">{stats.notRead}</div>
+                <div className="text-xs text-gray-600 truncate">Not Read</div>
               </CardContent>
             </Card>
           </div>
