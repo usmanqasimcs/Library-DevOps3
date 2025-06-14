@@ -1,7 +1,8 @@
 
 import { Book } from '@/types/book';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use environment variable or fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 class ApiService {
   private token: string | null = null;
@@ -9,6 +10,7 @@ class ApiService {
   constructor() {
     this.token = localStorage.getItem('token');
     console.log('ApiService initialized with token:', this.token ? 'Token present' : 'No token');
+    console.log('API Base URL:', API_BASE_URL);
   }
 
   private async request(endpoint: string, options: RequestInit = {}) {
@@ -82,7 +84,6 @@ class ApiService {
     console.log('Token removed on logout');
   }
 
-  // Books methods
   async getBooks() {
     console.log('Getting books with token:', this.token ? 'Present' : 'Missing');
     return this.request('/books');
