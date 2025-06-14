@@ -1,8 +1,22 @@
-
 import { Book } from '@/types/book';
 
-// Use environment variable or fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Use environment variable or fallback based on environment
+const getApiBaseUrl = () => {
+  // If we have a VITE_API_URL environment variable, use it
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // For development, use localhost
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5000/api';
+  }
+  
+  // For production, use relative path (nginx will proxy)
+  return '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   private token: string | null = null;
@@ -11,6 +25,7 @@ class ApiService {
     this.token = localStorage.getItem('token');
     console.log('ApiService initialized with token:', this.token ? 'Token present' : 'No token');
     console.log('API Base URL:', API_BASE_URL);
+    console.log('Environment:', import.meta.env.MODE);
   }
 
   private async request(endpoint: string, options: RequestInit = {}) {
