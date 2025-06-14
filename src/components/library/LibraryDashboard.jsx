@@ -29,7 +29,7 @@ export const LibraryDashboard = () => {
     status: 'not-read'
   });
 
-  // New state for bulk action (this must be declared before any return)
+  // New state for bulk action (keep this one at the top!)
   const [selectedNotReadIds, setSelectedNotReadIds] = useState(new Set());
 
   useEffect(() => {
