@@ -475,6 +475,9 @@ export const LibraryDashboard = () => {
     );
   }
 
+  // FIX: Define stats here
+  const stats = getBookStats();
+
   return (
     <div className="min-h-screen bg-gray-50" data-testid="library-dashboard">
       <header className="bg-white shadow-sm border-b">
