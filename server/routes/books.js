@@ -17,11 +17,13 @@ router.get('/', auth, async (req, res) => {
 // Create a new book
 router.post('/', auth, async (req, res) => {
   try {
-    const { title, author, status } = req.body;
+    const { title, author, status, publicationYear, rating } = req.body;
     const book = new Book({
       title,
       author,
       status,
+      publicationYear,
+      rating,
       userId: req.user._id
     });
     await book.save();

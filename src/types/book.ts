@@ -4,11 +4,9 @@ export interface Book {
   title: string;
   author: string;
   status: 'not-read' | 'reading' | 'finished';
-  genre?: string;
   publicationYear?: number;
-  pages?: number;
-  notes?: string;
   rating?: number;
+  isFavorite?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

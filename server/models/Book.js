@@ -12,10 +12,24 @@ const bookSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  publicationYear: {
+    type: Number,
+    min: 0,
+    max: new Date().getFullYear() + 10
+  },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5
+  },
   status: {
     type: String,
     enum: ['not-read', 'reading', 'finished'],
     default: 'not-read'
+  },
+  isFavorite: {
+    type: Boolean,
+    default: false
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

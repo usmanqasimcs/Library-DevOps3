@@ -3,17 +3,14 @@ import { Book } from '@/types/book';
 
 // Use environment variable or fallback based on environment
 const getApiBaseUrl = () => {
-  // If we have a VITE_API_URL environment variable, use it
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
   
-  // For development, use localhost
   if (import.meta.env.DEV) {
     return 'http://localhost:5000/api';
   }
   
-  // For production, use relative path (nginx will proxy)
   return '/api';
 };
 
@@ -32,7 +29,6 @@ class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     
-    // Ensure we have the latest token
     this.token = localStorage.getItem('token');
     
     const config = {
@@ -53,14 +49,12 @@ class ApiService {
     try {
       const response = await fetch(url, config);
       
-      // Check if response is JSON
       const contentType = response.headers.get('content-type');
       let data;
       
       if (contentType && contentType.includes('application/json')) {
         data = await response.json();
       } else {
-        // If not JSON, get text and try to parse
         const text = await response.text();
         try {
           data = JSON.parse(text);
