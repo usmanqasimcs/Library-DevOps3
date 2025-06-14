@@ -12,17 +12,36 @@ const generateToken = (userId) => {
 // Register
 router.post('/register', async (req, res) => {
   try {
+    console.log('Registration attempt:', req.body);
     const { name, email, password } = req.body;
 
+    // Validate input
+    if (!name || !email || !password) {
+      console.log('Missing required fields');
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    if (password.length < 6) {
+      console.log('Password too short');
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      console.log('User already exists:', email);
+      return res.status(400).json({ error: 'User already exists with this email' });
     }
 
     // Create new user
-    const user = new User({ name, email, password });
+    const user = new User({ 
+      name: name.trim(), 
+      email: email.toLowerCase().trim(), 
+      password 
+    });
+    
     await user.save();
+    console.log('User created successfully:', user.email);
 
     // Generate token
     const token = generateToken(user._id);
@@ -36,26 +55,38 @@ router.post('/register', async (req, res) => {
       token
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Server error during registration' });
   }
 });
 
 // Login
 router.post('/login', async (req, res) => {
   try {
+    console.log('Login attempt:', req.body.email);
     const { email, password } = req.body;
 
+    // Validate input
+    if (!email || !password) {
+      console.log('Missing email or password');
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      console.log('User not found:', email);
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      console.log('Invalid password for user:', email);
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
+
+    console.log('Login successful:', user.email);
 
     // Generate token
     const token = generateToken(user._id);
@@ -69,7 +100,8 @@ router.post('/login', async (req, res) => {
       token
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Server error during login' });
   }
 });
 

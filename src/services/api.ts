@@ -17,11 +17,18 @@ class ApiService {
       ...options,
     };
 
+    console.log(`Making request to: ${url}`, config);
+    
     const response = await fetch(url, config);
+    const data = await response.json();
+    
+    console.log(`Response from ${url}:`, { status: response.status, data });
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(data.error || `HTTP error! status: ${response.status}`);
     }
-    return response.json();
+    
+    return data;
   }
 
   // Auth methods
