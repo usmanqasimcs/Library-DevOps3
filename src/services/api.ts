@@ -1,4 +1,6 @@
 
+import { Book } from '@/types/book';
+
 const API_BASE_URL = 'http://localhost:5000/api';
 
 class ApiService {
