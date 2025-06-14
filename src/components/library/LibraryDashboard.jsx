@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
 import { LogOut, Library, Plus, ChevronDown, ChevronUp, Trash2, Search, Filter, BookOpen, Edit, Save, X, Star, StarOff } from 'lucide-react';
+import { SearchBar } from "./SearchBar";
+import { BulkMarkFinished } from "./BulkMarkFinished";
 
 export const LibraryDashboard = () => {
   const [books, setBooks] = useState([]);
@@ -289,7 +291,6 @@ export const LibraryDashboard = () => {
                   <p className="text-muted-foreground" data-testid="book-author">by {book.author}</p>
                 </>
               )}
-              {/* ... keep rest of this block unchanged (rating, etc) ... */}
               {!editingBookId === book._id && book.rating && (
                 <div className="flex gap-2 mt-2">
                   <Badge variant="outline" data-testid="book-rating">
@@ -312,7 +313,6 @@ export const LibraryDashboard = () => {
                   ? <Star size={20} fill="#facc15" stroke="#fde047" /> 
                   : <StarOff size={20} className="text-gray-400" />}
               </Button>
-              {/* ... keep rest of this (edit/save/cancel/toggle/delete) exactly unchanged ... */}
               {editingBookId === book._id ? (
                 <>
                   <Button
@@ -478,6 +478,44 @@ export const LibraryDashboard = () => {
   // FIX: Define stats here
   const stats = getBookStats();
 
+  // New state for bulk action
+  const [selectedNotReadIds, setSelectedNotReadIds] = useState(new Set());
+
+  const handleToggleSelect = (id) => {
+    setSelectedNotReadIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkMarkFinished = async () => {
+    if (selectedNotReadIds.size === 0) return;
+    let successCount = 0, failCount = 0;
+    for (const id of selectedNotReadIds) {
+      const bookToUpdate = books.find(b => b._id === id);
+      if (!bookToUpdate || bookToUpdate.status === "finished") continue;
+      try {
+        await apiService.updateBook(id, { ...bookToUpdate, status: "finished" });
+        setBooks(prev =>
+          prev.map(b => (b._id === id ? { ...b, status: "finished" } : b))
+        );
+        successCount++;
+      } catch {
+        failCount++;
+      }
+    }
+    setSelectedNotReadIds(new Set());
+    toast({
+      title: `Marked ${successCount} book(s) as finished${failCount ? `, ${failCount} failed.` : '.'}`,
+      variant: failCount ? "destructive" : "default"
+    });
+  };
+
+  const notReadBooks = getBooksByStatus('not-read');
+
+  // --- Use the new SearchBar and move icon before input ---
   return (
     <div className="min-h-screen bg-gray-50" data-testid="library-dashboard">
       <header className="bg-white shadow-sm border-b">
@@ -497,158 +535,174 @@ export const LibraryDashboard = () => {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* --- NEW: Search Bar at the Top --- */}
-        {renderSearchBar()}
+        {/* --- 1. SEARCH BAR ON TOP --- */}
+        <SearchBar value={searchTerm} onChange={setSearchTerm} />
 
+        {/* --- 2. STATISTICS --- */}
+        <div
+          className="flex gap-2 w-full overflow-x-auto pb-2"
+          data-testid="stats-section"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          <Card className="min-w-[200px] flex-1">
+            <CardContent className="p-2 text-center">
+              <div className="text-lg font-bold text-gray-900 truncate" data-testid="total-books">{stats.total}</div>
+              <div className="text-xs text-gray-600 truncate">Total Books</div>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[200px] flex-1">
+            <CardContent className="p-2 text-center">
+              <div className="text-lg font-bold text-blue-600 truncate" data-testid="reading-books">{stats.reading}</div>
+              <div className="text-xs text-gray-600 truncate">Currently Reading</div>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[200px] flex-1">
+            <CardContent className="p-2 text-center">
+              <div className="text-lg font-bold text-green-600 truncate" data-testid="finished-books">{stats.finished}</div>
+              <div className="text-xs text-gray-600 truncate">Finished</div>
+            </CardContent>
+          </Card>
+          <Card className="min-w-[200px] flex-1">
+            <CardContent className="p-2 text-center">
+              <div className="text-lg font-bold text-gray-600 truncate" data-testid="unread-books">{stats.notRead}</div>
+              <div className="text-xs text-gray-600 truncate">Not Read</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* --- 3. Add Book Section stays same --- */}
+        <Card data-testid="add-book-section">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Add New Book</CardTitle>
+              <Button onClick={() => setShowAddForm(!showAddForm)} data-testid="toggle-add-form">
+                <Plus className="w-4 h-4 mr-2" />
+                {showAddForm ? 'Cancel' : 'Add Book'}
+              </Button>
+            </div>
+          </CardHeader>
+          {showAddForm && (
+            <CardContent data-testid="add-book-form">
+              <form onSubmit={handleAddBook} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Title *</label>
+                    <input
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={newBook.title}
+                      onChange={(e) => setNewBook({...newBook, title: e.target.value})}
+                      placeholder="Enter book title"
+                      required
+                      data-testid="title-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Author *</label>
+                    <input
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={newBook.author}
+                      onChange={(e) => setNewBook({...newBook, author: e.target.value})}
+                      placeholder="Enter author name"
+                      required
+                      data-testid="author-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Status</label>
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={newBook.status}
+                      onChange={(e) => setNewBook({...newBook, status: e.target.value})}
+                      data-testid="status-input"
+                    >
+                      <option value="not-read">Not Read</option>
+                      <option value="reading">Reading</option>
+                      <option value="finished">Finished</option>
+                    </select>
+                  </div>
+                </div>
+                <Button type="submit" className="w-full" data-testid="submit-book-button">
+                  Add Book to Library
+                </Button>
+              </form>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* --- 4. Books Sections --- */}
         <div className="space-y-8">
-          {/* Statistics Cards */}
-          <div
-            className="flex gap-2 w-full overflow-x-auto pb-2"
-            data-testid="stats-section"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
-            <Card className="min-w-[200px] flex-1">
-              <CardContent className="p-2 text-center">
-                <div className="text-lg font-bold text-gray-900 truncate" data-testid="total-books">{stats.total}</div>
-                <div className="text-xs text-gray-600 truncate">Total Books</div>
-              </CardContent>
-            </Card>
-            <Card className="min-w-[200px] flex-1">
-              <CardContent className="p-2 text-center">
-                <div className="text-lg font-bold text-blue-600 truncate" data-testid="reading-books">{stats.reading}</div>
-                <div className="text-xs text-gray-600 truncate">Currently Reading</div>
-              </CardContent>
-            </Card>
-            <Card className="min-w-[200px] flex-1">
-              <CardContent className="p-2 text-center">
-                <div className="text-lg font-bold text-green-600 truncate" data-testid="finished-books">{stats.finished}</div>
-                <div className="text-xs text-gray-600 truncate">Finished</div>
-              </CardContent>
-            </Card>
-            <Card className="min-w-[200px] flex-1">
-              <CardContent className="p-2 text-center">
-                <div className="text-lg font-bold text-gray-600 truncate" data-testid="unread-books">{stats.notRead}</div>
-                <div className="text-xs text-gray-600 truncate">Not Read</div>
-              </CardContent>
-            </Card>
+          {/* Not Read Section with Bulk Action */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4" data-testid="not-read-section-title">
+              📚 Not Read ({notReadBooks.length})
+            </h2>
+            {/* Bulk action bar */}
+            <BulkMarkFinished
+              books={notReadBooks}
+              selectedIds={selectedNotReadIds}
+              onToggle={() => {}} // Not used in bulk bar, selection is handled below per book
+              onBulkMark={handleBulkMarkFinished}
+            />
+            {notReadBooks.length === 0 ? (
+              <Card data-testid="empty-not-read">
+                <CardContent className="text-center py-8">
+                  <p className="text-muted-foreground">No books in this section</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="not-read-books">
+                {notReadBooks.map((book) => (
+                  <div key={book._id} className="relative">
+                    {/* Checkbox top-right for bulk select */}
+                    <input
+                      type="checkbox"
+                      className="absolute right-2 top-2 z-10 w-4 h-4 accent-primary"
+                      checked={selectedNotReadIds.has(book._id)}
+                      onChange={() => handleToggleSelect(book._id)}
+                      data-testid={`select-book-${book._id}`}
+                    />
+                    {renderBookCard(book)}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Add Book Section */}
-          <Card data-testid="add-book-section">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Add New Book</CardTitle>
-                <Button onClick={() => setShowAddForm(!showAddForm)} data-testid="toggle-add-form">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {showAddForm ? 'Cancel' : 'Add Book'}
-                </Button>
+          {/* Currently Reading Section */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4" data-testid="reading-section-title">
+              📖 Currently Reading ({getBooksByStatus('reading').length})
+            </h2>
+            {getBooksByStatus('reading').length === 0 ? (
+              <Card data-testid="empty-reading">
+                <CardContent className="text-center py-8">
+                  <p className="text-muted-foreground">No books in this section</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="reading-books">
+                {getBooksByStatus('reading').map(renderBookCard)}
               </div>
-            </CardHeader>
-            {showAddForm && (
-              <CardContent data-testid="add-book-form">
-                <form onSubmit={handleAddBook} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Title *</label>
-                      <input
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        value={newBook.title}
-                        onChange={(e) => setNewBook({...newBook, title: e.target.value})}
-                        placeholder="Enter book title"
-                        required
-                        data-testid="title-input"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Author *</label>
-                      <input
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        value={newBook.author}
-                        onChange={(e) => setNewBook({...newBook, author: e.target.value})}
-                        placeholder="Enter author name"
-                        required
-                        data-testid="author-input"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Status</label>
-                      <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        value={newBook.status}
-                        onChange={(e) => setNewBook({...newBook, status: e.target.value})}
-                        data-testid="status-input"
-                      >
-                        <option value="not-read">Not Read</option>
-                        <option value="reading">Reading</option>
-                        <option value="finished">Finished</option>
-                      </select>
-                    </div>
-                  </div>
-                  <Button type="submit" className="w-full" data-testid="submit-book-button">
-                    Add Book to Library
-                  </Button>
-                </form>
-              </CardContent>
             )}
-          </Card>
+          </div>
 
-          {/* Books Sections */}
-          <div className="space-y-8">
-            {/* Not Read Section */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4" data-testid="not-read-section-title">
-                📚 Not Read ({getBooksByStatus('not-read').length})
-              </h2>
-              {getBooksByStatus('not-read').length === 0 ? (
-                <Card data-testid="empty-not-read">
-                  <CardContent className="text-center py-8">
-                    <p className="text-muted-foreground">No books in this section</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="not-read-books">
-                  {getBooksByStatus('not-read').map(renderBookCard)}
-                </div>
-              )}
-            </div>
-
-            {/* Currently Reading Section */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4" data-testid="reading-section-title">
-                📖 Currently Reading ({getBooksByStatus('reading').length})
-              </h2>
-              {getBooksByStatus('reading').length === 0 ? (
-                <Card data-testid="empty-reading">
-                  <CardContent className="text-center py-8">
-                    <p className="text-muted-foreground">No books in this section</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="reading-books">
-                  {getBooksByStatus('reading').map(renderBookCard)}
-                </div>
-              )}
-            </div>
-
-            {/* Finished Section */}
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4" data-testid="finished-section-title">
-                ✅ Finished ({getBooksByStatus('finished').length})
-              </h2>
-              {getBooksByStatus('finished').length === 0 ? (
-                <Card data-testid="empty-finished">
-                  <CardContent className="text-center py-8">
-                    <p className="text-muted-foreground">No books in this section</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="finished-books">
-                  {getBooksByStatus('finished').map(renderBookCard)}
-                </div>
-              )}
-            </div>
+          {/* Finished Section */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4" data-testid="finished-section-title">
+              ✅ Finished ({getBooksByStatus('finished').length})
+            </h2>
+            {getBooksByStatus('finished').length === 0 ? (
+              <Card data-testid="empty-finished">
+                <CardContent className="text-center py-8">
+                  <p className="text-muted-foreground">No books in this section</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="finished-books">
+                {getBooksByStatus('finished').map(renderBookCard)}
+              </div>
+            )}
           </div>
         </div>
       </main>
