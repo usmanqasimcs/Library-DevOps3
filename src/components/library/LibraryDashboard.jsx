@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
-import { LogOut, Library, Plus, ChevronDown, ChevronUp, Trash2, Search, Filter, BookOpen, Edit, Save, X } from 'lucide-react';
+import { LogOut, Library, Plus, ChevronDown, ChevronUp, Trash2, Search, Filter, BookOpen, Edit, Save, X, Star, StarOff } from 'lucide-react';
 
 export const LibraryDashboard = () => {
   const [books, setBooks] = useState([]);
@@ -18,6 +18,7 @@ export const LibraryDashboard = () => {
   const [editingBookId, setEditingBookId] = useState(null);
   const [editingBook, setEditingBook] = useState({});
   const { user, logout } = useAuth();
+  const [favoriteBookIds, setFavoriteBookIds] = useState(new Set());
 
   // Simplified form state for adding books
   const [newBook, setNewBook] = useState({
@@ -32,16 +33,18 @@ export const LibraryDashboard = () => {
 
   useEffect(() => {
     filterAndSortBooks();
-  }, [books, searchTerm, sortBy]);
+  }, [books, searchTerm, sortBy, favoriteBookIds]);
 
   const filterAndSortBooks = () => {
     let filtered = [...books];
     
     // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(book => 
-        book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchTerm.toLowerCase())
+    if (searchTerm && searchTerm.trim() !== '') {
+      const term = searchTerm.trim().toLowerCase();
+      filtered = filtered.filter(book =>
+        (book.title && book.title.toLowerCase().includes(term)) ||
+        (book.author && book.author.toLowerCase().includes(term)) ||
+        (book.publicationYear && book.publicationYear.toString() === term)
       );
     }
     
@@ -198,216 +201,271 @@ export const LibraryDashboard = () => {
   };
 
   const getBooksByStatus = (status) => {
-    return filteredBooks.filter(book => book.status === status);
+    // Always place favorite books at the top within each status section
+    const booksInStatus = filteredBooks.filter(book => book.status === status);
+    return [
+      ...booksInStatus.filter(book => favoriteBookIds.has(book._id)),
+      ...booksInStatus.filter(book => !favoriteBookIds.has(book._id)),
+    ];
   };
 
-  const stats = getBookStats();
+  const toggleFavorite = (id) => {
+    setFavoriteBookIds(prev => {
+      const updated = new Set(prev);
+      if (updated.has(id)) {
+        updated.delete(id);
+      } else {
+        updated.add(id);
+      }
+      return updated;
+    });
+  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" data-testid="loading-screen">
-        <div className="text-lg">Loading your library...</div>
+  const renderSearchBar = () => (
+    <div className="w-full mb-4 flex items-center" data-testid="search-bar-container">
+      <div className="relative w-full max-w-md">
+        <input
+          type="text"
+          className="block w-full rounded-md border border-input bg-background py-2 pl-10 pr-4 text-base md:text-sm"
+          placeholder="🔍 Search by title, author, or year..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          data-testid="search-bar"
+        />
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+          <Search size={18} />
+        </span>
       </div>
-    );
-  }
+    </div>
+  );
 
-  const renderBookCard = (book) => (
-    <Card key={book._id} className="transition-all duration-200 hover:shadow-md" data-testid={`book-card-${book._id}`}>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            {editingBookId === book._id ? (
-              <div className="space-y-2">
-                <input
-                  className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-semibold"
-                  value={editingBook.title || ''}
-                  onChange={(e) => setEditingBook({...editingBook, title: e.target.value})}
-                  data-testid="edit-title-input"
-                />
-                <input
-                  className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                  value={editingBook.author || ''}
-                  onChange={(e) => setEditingBook({...editingBook, author: e.target.value})}
-                  data-testid="edit-author-input"
-                />
-                <select
-                  className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
-                  value={editingBook.status || ''}
-                  onChange={(e) => setEditingBook({...editingBook, status: e.target.value})}
-                  data-testid="edit-status-select"
-                >
-                  <option value="not-read">Not Read</option>
-                  <option value="reading">Reading</option>
-                  <option value="finished">Finished</option>
-                </select>
-              </div>
-            ) : (
-              <>
-                <CardTitle className="text-lg" data-testid="book-title">{book.title}</CardTitle>
-                <p className="text-muted-foreground" data-testid="book-author">by {book.author}</p>
-              </>
-            )}
-            {!editingBookId === book._id && book.rating && (
-              <div className="flex gap-2 mt-2">
-                <Badge variant="outline" data-testid="book-rating">
-                  ★ {book.rating}/5
-                </Badge>
-              </div>
-            )}
-          </div>
-          <div className="flex space-x-2">
-            {editingBookId === book._id ? (
-              <>
+  const renderBookCard = (book) => {
+    const isFavorite = favoriteBookIds.has(book._id);
+
+    return (
+      <Card
+        key={book._id}
+        className={`transition-all duration-200 hover:shadow-md relative border-2 ${isFavorite ? 'border-yellow-400' : ''}`}
+        data-testid={`book-card-${book._id}`}
+      >
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              {editingBookId === book._id ? (
+                <div className="space-y-2">
+                  <input
+                    className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-semibold"
+                    value={editingBook.title || ''}
+                    onChange={(e) => setEditingBook({...editingBook, title: e.target.value})}
+                    data-testid="edit-title-input"
+                  />
+                  <input
+                    className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    value={editingBook.author || ''}
+                    onChange={(e) => setEditingBook({...editingBook, author: e.target.value})}
+                    data-testid="edit-author-input"
+                  />
+                  <select
+                    className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    value={editingBook.status || ''}
+                    onChange={(e) => setEditingBook({...editingBook, status: e.target.value})}
+                    data-testid="edit-status-select"
+                  >
+                    <option value="not-read">Not Read</option>
+                    <option value="reading">Reading</option>
+                    <option value="finished">Finished</option>
+                  </select>
+                </div>
+              ) : (
+                <>
+                  <CardTitle className="text-lg flex items-center gap-2" data-testid="book-title">
+                    {book.title}
+                    {isFavorite && (
+                      <span className="inline-block text-yellow-500" data-testid="favorite-star">
+                        <Star size={16} fill="#facc15" stroke="#fde047" />
+                      </span>
+                    )}
+                  </CardTitle>
+                  <p className="text-muted-foreground" data-testid="book-author">by {book.author}</p>
+                </>
+              )}
+              {/* ... keep rest of this block unchanged (rating, etc) ... */}
+              {!editingBookId === book._id && book.rating && (
+                <div className="flex gap-2 mt-2">
+                  <Badge variant="outline" data-testid="book-rating">
+                    ★ {book.rating}/5
+                  </Badge>
+                </div>
+              )}
+            </div>
+            <div className="flex space-x-2 items-center">
+              {/* Favorite toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => toggleFavorite(book._id)}
+                aria-label={isFavorite ? "Unfavorite book" : "Mark as favorite"}
+                className="p-0"
+                data-testid="favorite-toggle"
+              >
+                {isFavorite 
+                  ? <Star size={20} fill="#facc15" stroke="#fde047" /> 
+                  : <StarOff size={20} className="text-gray-400" />}
+              </Button>
+              {/* ... keep rest of this (edit/save/cancel/toggle/delete) exactly unchanged ... */}
+              {editingBookId === book._id ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleUpdateBook(book._id)}
+                    data-testid="save-edit-button"
+                  >
+                    <Save className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={cancelEditing}
+                    data-testid="cancel-edit-button"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </>
+              ) : (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleUpdateBook(book._id)}
-                  data-testid="save-edit-button"
+                  onClick={() => startEditing(book)}
+                  data-testid="edit-book-button"
                 >
-                  <Save className="w-4 h-4" />
+                  <Edit className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={cancelEditing}
-                  data-testid="cancel-edit-button"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </>
-            ) : (
+              )}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => startEditing(book)}
-                data-testid="edit-book-button"
+                onClick={() => toggleBookDetails(book._id)}
+                data-testid="toggle-details-button"
               >
-                <Edit className="w-4 h-4" />
+                {expandedBookId === book._id ? (
+                  <>
+                    <ChevronUp className="w-4 h-4 mr-1" />
+                    Hide
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4 mr-1" />
+                    Details
+                  </>
+                )}
               </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => toggleBookDetails(book._id)}
-              data-testid="toggle-details-button"
-            >
-              {expandedBookId === book._id ? (
-                <>
-                  <ChevronUp className="w-4 h-4 mr-1" />
-                  Hide
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-4 h-4 mr-1" />
-                  Details
-                </>
-              )}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleDeleteBook(book._id)}
-              data-testid="delete-book-button"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleDeleteBook(book._id)}
+                data-testid="delete-book-button"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      {expandedBookId === book._id && (
-        <CardContent className="pt-0" data-testid="book-details">
-          {editingBookId === book._id ? (
-            <div className="border-t pt-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Genre</label>
-                  <input
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={editingBook.genre || ''}
-                    onChange={(e) => setEditingBook({...editingBook, genre: e.target.value})}
-                    placeholder="Enter genre"
-                    data-testid="edit-genre-input"
-                  />
+        </CardHeader>
+        {expandedBookId === book._id && (
+          <CardContent className="pt-0" data-testid="book-details">
+            {editingBookId === book._id ? (
+              <div className="border-t pt-4 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Genre</label>
+                    <input
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={editingBook.genre || ''}
+                      onChange={(e) => setEditingBook({...editingBook, genre: e.target.value})}
+                      placeholder="Enter genre"
+                      data-testid="edit-genre-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Publication Year</label>
+                    <input
+                      type="number"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={editingBook.publicationYear || ''}
+                      onChange={(e) => setEditingBook({...editingBook, publicationYear: parseInt(e.target.value)})}
+                      placeholder="Enter year"
+                      data-testid="edit-year-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Pages</label>
+                    <input
+                      type="number"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={editingBook.pages || ''}
+                      onChange={(e) => setEditingBook({...editingBook, pages: parseInt(e.target.value)})}
+                      placeholder="Number of pages"
+                      data-testid="edit-pages-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Rating (1-5)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="5"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={editingBook.rating || ''}
+                      onChange={(e) => setEditingBook({...editingBook, rating: parseInt(e.target.value)})}
+                      placeholder="Rate 1-5"
+                      data-testid="edit-rating-input"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Publication Year</label>
-                  <input
-                    type="number"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={editingBook.publicationYear || ''}
-                    onChange={(e) => setEditingBook({...editingBook, publicationYear: parseInt(e.target.value)})}
-                    placeholder="Enter year"
-                    data-testid="edit-year-input"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Pages</label>
-                  <input
-                    type="number"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={editingBook.pages || ''}
-                    onChange={(e) => setEditingBook({...editingBook, pages: parseInt(e.target.value)})}
-                    placeholder="Number of pages"
-                    data-testid="edit-pages-input"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Rating (1-5)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={editingBook.rating || ''}
-                    onChange={(e) => setEditingBook({...editingBook, rating: parseInt(e.target.value)})}
-                    placeholder="Rate 1-5"
-                    data-testid="edit-rating-input"
+                  <label className="text-sm font-medium">Notes</label>
+                  <textarea
+                    className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    value={editingBook.notes || ''}
+                    onChange={(e) => setEditingBook({...editingBook, notes: e.target.value})}
+                    placeholder="Personal notes"
+                    data-testid="edit-notes-input"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Notes</label>
-                <textarea
-                  className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={editingBook.notes || ''}
-                  onChange={(e) => setEditingBook({...editingBook, notes: e.target.value})}
-                  placeholder="Personal notes"
-                  data-testid="edit-notes-input"
-                />
+            ) : (
+              <div className="border-t pt-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-600">Genre:</span>
+                    <p data-testid="book-genre">{book.genre || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Publication Year:</span>
+                    <p data-testid="book-year">{book.publicationYear || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Pages:</span>
+                    <p data-testid="book-pages">{book.pages || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Rating:</span>
+                    <p data-testid="book-rating-detail">{book.rating ? `★ ${book.rating}/5` : 'N/A'}</p>
+                  </div>
+                </div>
+                {book.notes && (
+                  <div className="mt-4">
+                    <span className="font-medium text-gray-600">Notes:</span>
+                    <p className="mt-1 text-sm" data-testid="book-notes">{book.notes}</p>
+                  </div>
+                )}
               </div>
-            </div>
-          ) : (
-            <div className="border-t pt-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="font-medium text-gray-600">Genre:</span>
-                  <p data-testid="book-genre">{book.genre || 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-600">Publication Year:</span>
-                  <p data-testid="book-year">{book.publicationYear || 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-600">Pages:</span>
-                  <p data-testid="book-pages">{book.pages || 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-600">Rating:</span>
-                  <p data-testid="book-rating-detail">{book.rating ? `★ ${book.rating}/5` : 'N/A'}</p>
-                </div>
-              </div>
-              {book.notes && (
-                <div className="mt-4">
-                  <span className="font-medium text-gray-600">Notes:</span>
-                  <p className="mt-1 text-sm" data-testid="book-notes">{book.notes}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      )}
-    </Card>
-  );
+            )}
+          </CardContent>
+        )}
+      </Card>
+    );
+  };
 
   if (loading) {
     return (
@@ -438,6 +496,9 @@ export const LibraryDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* --- NEW: Search Bar at the Top --- */}
+        {renderSearchBar()}
+
         <div className="space-y-8">
           {/* Statistics Cards */}
           <div
