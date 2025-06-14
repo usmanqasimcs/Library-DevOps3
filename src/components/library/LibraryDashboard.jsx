@@ -53,32 +53,6 @@ export const LibraryDashboard = () => {
     }
   };
 
-  const filterAndSortBooks = () => {
-    let filtered = books.filter(book => {
-      const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (book.genre && book.genre.toLowerCase().includes(searchTerm.toLowerCase()));
-      return matchesSearch;
-    });
-
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'title':
-          return a.title.localeCompare(b.title);
-        case 'author':
-          return a.author.localeCompare(b.author);
-        case 'year':
-          return (b.publicationYear || 0) - (a.publicationYear || 0);
-        case 'rating':
-          return (b.rating || 0) - (a.rating || 0);
-        default:
-          return 0;
-      }
-    });
-
-    setFilteredBooks(filtered);
-  };
-
   const handleAddBook = async (e) => {
     e.preventDefault();
     if (!newBook.title.trim() || !newBook.author.trim()) {
@@ -464,56 +438,6 @@ export const LibraryDashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* Search and Filter Section */}
-          <Card data-testid="search-filter-section">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5" />
-                Search & Sort
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Search Books</label>
-                  <input
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by title, author, or genre"
-                    data-testid="search-input"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Sort by</label>
-                  <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    data-testid="sort-select"
-                  >
-                    <option value="title">Title</option>
-                    <option value="author">Author</option>
-                    <option value="year">Publication Year</option>
-                    <option value="rating">Rating</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium invisible">Actions</label>
-                  <Button 
-                    variant="outline" 
-                    onClick={clearFilters} 
-                    className="w-full"
-                    data-testid="clear-filters-button"
-                  >
-                    <Filter className="w-4 h-4 mr-2" />
-                    Clear Search
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Add Book Section */}
           <Card data-testid="add-book-section">
