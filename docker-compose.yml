@@ -10,7 +10,7 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_URI=mongodb+srv://usmanqasimcsa:looper@cluster0.jnelddy.mongodb.net/library
       - JWT_SECRET=${JWT_SECRET}
       - PORT=5000
     networks:
