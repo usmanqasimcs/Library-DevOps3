@@ -323,15 +323,14 @@ export const LibraryDashboard = () => {
               My Digital Library
             </h1>
           </div>
-          {/* Right: Logout Button flush right and always visible */}
-          <div className="flex-1 flex justify-end">
+          {/* Right: Logout Button at the very end/right */}
+          <div className="flex-1 flex justify-end items-center">
             <Button
               variant="destructive"
               onClick={logout}
               className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
               data-testid="logout-button"
               style={{
-                position: 'relative',
                 background: '#dc2626', // fallback in case of css issues
                 color: '#fff'
               }}
@@ -451,3 +450,5 @@ export const LibraryDashboard = () => {
     </div>
   );
 };
+
+export default LibraryDashboard;
