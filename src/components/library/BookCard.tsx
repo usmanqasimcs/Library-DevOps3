@@ -4,33 +4,49 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Book } from '@/types/book';
-import { Trash2, CheckCircle, Star } from 'lucide-react';
+import { Trash2, CheckCircle, Star, Bookmark } from 'lucide-react';
 
 interface BookCardProps {
   book: Book;
   onStatusChange: (id: string, status: Book['status']) => void;
   onDelete: (id: string) => void;
+  onToggleFavorite?: (id: string) => void; // NEW
 }
 
 export const BookCard: React.FC<BookCardProps & { _favoritesCard?: boolean }> = ({
-  book, onStatusChange, onDelete, _favoritesCard
+  book, onStatusChange, onDelete, onToggleFavorite, _favoritesCard
 }) => {
-  // Only show favorite star in standard (non-favorites) card, inline with title and only once
-  // Never show star in simplified favorites card
+  // Only show favorite bookmark in standard (non-favorites) card, beside title
+  // Never show favorite button in simplified favorites card
 
   return (
     <Card className={`h-full flex flex-col${_favoritesCard ? " border-yellow-200" : ""}`}>
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-1">
-          <CardTitle className="text-lg flex items-center gap-2 text-gray-900" data-testid="book-title">
-            {book.title}
-            {/* Only show favorite star in normal mode, never in simplified favorites card */}
-            {!_favoritesCard && !!book.isFavorite && (
-              <span className="inline-block text-yellow-500" data-testid="favorite-star">
-                <Star size={18} fill="#eab308" stroke="#f59e0b" />
-              </span>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-lg flex items-center gap-2 text-gray-900" data-testid="book-title">
+              {book.title}
+            </CardTitle>
+            {/* Favorite button: ONLY SHOW on normal (non-favorites) cards */}
+            {!_favoritesCard && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onToggleFavorite?.(book._id!)}
+                aria-label={book.isFavorite ? "Unmark as favorite" : "Mark as favorite"}
+                className="p-2 hover:bg-yellow-100 transition"
+                data-testid="favorite-bookmark-btn"
+                type="button"
+              >
+                <Bookmark
+                  size={20}
+                  stroke={book.isFavorite ? "#eab308" : "#d1d5db"}
+                  fill={book.isFavorite ? "#eab308" : "none"}
+                  className={book.isFavorite ? "text-yellow-500" : "text-gray-300"}
+                />
+              </Button>
             )}
-          </CardTitle>
+          </div>
           <p className="text-gray-600 text-sm mb-1" data-testid="book-author">by {book.author}</p>
           <Badge className={`${book.status === 'not-read'
             ? 'bg-gray-100 text-gray-800'
