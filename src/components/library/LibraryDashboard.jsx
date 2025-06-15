@@ -257,197 +257,35 @@ export const LibraryDashboard = () => {
   };
 
   const renderBookCard = (book) => {
-    const isFavorite = book.isFavorite;
+    // DO NOT add extra favorite icon here.
+    // If _favoritesCard is true (favorites tab), BookCard will render it minimally.
+    // Otherwise, BookCard itself will handle star logic.
+    // Drop any extra <Star> rendering here and just use BookCard, passing _favoritesCard when needed.
+    const isFavoriteTabCard = book._favoritesCard === true;
 
     return (
-      <Card
-        key={book._id}
-        className={`transition-all duration-300 hover:shadow-2xl relative border-2 bg-white/95 backdrop-blur-sm ${
-          isFavorite 
-            ? 'border-yellow-400 shadow-yellow-400/20' 
-            : 'border-gray-300 hover:border-blue-500'
-        }`}
-        data-testid={`book-card-${book._id}`}
-      >
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              {editingBookId === book._id ? (
-                <div className="space-y-3">
-                  <input
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 focus:border-blue-500"
-                    value={editingBook.title || ''}
-                    onChange={(e) => setEditingBook({...editingBook, title: e.target.value})}
-                    placeholder="Book title"
-                    data-testid="edit-title-input"
-                  />
-                  <input
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
-                    value={editingBook.author || ''}
-                    onChange={(e) => setEditingBook({...editingBook, author: e.target.value})}
-                    placeholder="Author name"
-                    data-testid="edit-author-input"
-                  />
-                  <select
-                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
-                    value={editingBook.status || ''}
-                    onChange={(e) => setEditingBook({...editingBook, status: e.target.value})}
-                    data-testid="edit-status-select"
-                  >
-                    <option value="not-read">📚 Not Read</option>
-                    <option value="reading">📖 Reading</option>
-                    <option value="finished">✅ Finished</option>
-                  </select>
-                </div>
-              ) : (
-                <>
-                  <CardTitle className="text-lg flex items-center gap-2 text-gray-900" data-testid="book-title">
-                    {book.title}
-                    {isFavorite && (
-                      <span className="inline-block text-yellow-500" data-testid="favorite-star">
-                        <Star size={16} fill="#eab308" stroke="#f59e0b" />
-                      </span>
-                    )}
-                  </CardTitle>
-                  <p className="text-gray-600 mt-1" data-testid="book-author">by {book.author}</p>
-                  <Badge className={`${getStatusColor(book.status)} mt-2 w-fit`}>
-                    {book.status === 'not-read' ? '📚' : book.status === 'reading' ? '📖' : '✅'} {book.status.replace('-', ' ').toUpperCase()}
-                  </Badge>
-                </>
-              )}
-            </div>
-            <div className="flex space-x-2 items-center ml-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => toggleFavorite(book._id)}
-                aria-label={isFavorite ? "Unfavorite book" : "Mark as favorite"}
-                className="p-2 hover:bg-gray-100"
-                data-testid="favorite-toggle"
-              >
-                {isFavorite 
-                  ? <Star size={20} fill="#eab308" stroke="#f59e0b" /> 
-                  : <StarOff size={20} className="text-gray-400 hover:text-yellow-500" />}
-              </Button>
-              {editingBookId === book._id ? (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleUpdateBook(book._id)}
-                    className="bg-green-600 hover:bg-green-700 border-green-600 text-white"
-                    data-testid="save-edit-button"
-                  >
-                    <Save className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={cancelEditing}
-                    className="bg-gray-600 hover:bg-gray-700 border-gray-600 text-white"
-                    data-testid="cancel-edit-button"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => startEditing(book)}
-                  className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-blue-900 font-semibold"
-                  data-testid="edit-book-button"
-                >
-                  <Edit className="w-4 h-4" />
-                  <span className="ml-1">Edit</span>
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => toggleBookDetails(book._id)}
-                className="bg-purple-100 hover:bg-purple-200 border-purple-200 text-purple-900 font-semibold"
-                data-testid="toggle-details-button"
-              >
-                {expandedBookId === book._id ? (
-                  <>
-                    <ChevronUp className="w-4 h-4 mr-1" />
-                    Hide
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="w-4 h-4 mr-1" />
-                    Details
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleDeleteBook(book._id)}
-                className="bg-red-600 hover:bg-red-700"
-                data-testid="delete-book-button"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        {expandedBookId === book._id && (
-          <CardContent className="pt-0 border-t border-gray-200" data-testid="book-details">
-            {editingBookId === book._id ? (
-              <div className="pt-4 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Publication Year</label>
-                    <input
-                      type="number"
-                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
-                      value={editingBook.publicationYear || ''}
-                      onChange={(e) => setEditingBook({...editingBook, publicationYear: parseInt(e.target.value) || ''})}
-                      placeholder="Enter year"
-                      min={1000}
-                      max={2030}
-                      data-testid="edit-year-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-600">Rating (1-5)</label>
-                    <input
-                      type="number"
-                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
-                      value={editingBook.rating || ''}
-                      onChange={(e) => setEditingBook({...editingBook, rating: parseInt(e.target.value) || ''})}
-                      placeholder="Rate 1-5"
-                      min={1}
-                      max={5}
-                      data-testid="edit-rating-input"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="pt-4">
-                <div className="grid grid-cols-2 gap-6 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-500">Publication Year:</span>
-                    <p className="text-gray-900 font-medium" data-testid="book-year">
-                      {book.publicationYear ? `📅 ${book.publicationYear}` : 'Not specified'}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-500">Rating:</span>
-                    <p className="text-gray-900 font-medium" data-testid="book-rating">
-                      {book.rating ? `⭐ ${book.rating}/5` : 'Not rated'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        )}
-      </Card>
+      <div className="flex h-full min-h-[260px]">
+        <BookCard
+          book={book}
+          onStatusChange={(id, status) => handleUpdateBookStatus(id, status)} // use your own handler
+          onDelete={handleDeleteBook}
+          _favoritesCard={isFavoriteTabCard}
+        />
+      </div>
     );
+  };
+
+  // Helper function to update book status, if not present yet:
+  const handleUpdateBookStatus = async (id, status) => {
+    try {
+      const book = books.find(b => b._id === id);
+      if (!book) return;
+      const updatedBook = await apiService.updateBook(id, { ...book, status });
+      setBooks(prev => prev.map(b => b._id === id ? { ...b, status: updatedBook.status } : b));
+      toast({ title: `Status changed to "${status}"` });
+    } catch (e) {
+      toast({ title: 'Failed to change status', variant: 'destructive' });
+    }
   };
 
   if (loading) {
@@ -484,16 +322,20 @@ export const LibraryDashboard = () => {
               My Digital Library
             </h1>
           </div>
-          {/* Logout Button on far right */}
-          <div className="flex items-center justify-end" style={{ flex: 1 }}>
+          {/* Right: Logout Button flush right and always visible */}
+          <div className="flex-1 flex justify-end">
             <Button
               variant="destructive"
               onClick={logout}
               className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
               data-testid="logout-button"
-              style={{ position: 'relative' }}
+              style={{
+                position: 'relative',
+                background: '#dc2626', // fallback in case of css issues
+                color: '#fff'
+              }}
             >
-              <LogOut className="w-5 h-5 mr-2" />
+              <LogOut className="w-5 h-5 mr-2 text-white" />
               Logout
             </Button>
           </div>
