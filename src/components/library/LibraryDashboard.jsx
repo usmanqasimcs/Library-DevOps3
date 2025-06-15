@@ -464,47 +464,59 @@ export const LibraryDashboard = () => {
   const stats = getBookStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100" data-testid="library-dashboard">
-      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center h-20 gap-3 md:gap-0">
-            <div className="flex items-center">
-              <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-xl mr-4 shadow">
-                <Library className="w-7 h-7 text-white" data-testid="library-icon" />
-              </div>
-              <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight" data-testid="page-title">
-                My Digital Library
-              </h1>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-sky-50 to-pink-100" data-testid="library-dashboard">
+      <header className="sticky top-0 z-20 bg-gradient-to-r from-purple-400/70 via-sky-50/80 to-pink-100/80 shadow-lg border-b border-blue-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          <div className="flex items-center h-24">
+            {/* Colored Logo container */}
+            <div className="p-3 rounded-xl mr-5 shadow bg-gradient-to-tr from-blue-500 via-purple-500 to-fuchsia-400 flex items-center justify-center">
+              <Library className="w-8 h-8 text-white drop-shadow" data-testid="library-icon" />
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-base font-medium text-gray-700" data-testid="welcome-message">
-                Welcome, <span className="font-semibold text-purple-700">{user?.name || 'Reader'}</span>!
-              </span>
-              <Button
-                variant="outline"
-                onClick={logout}
-                className="bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800 font-semibold px-4 py-2"
-                data-testid="logout-button"
-              >
-                <LogOut className="w-5 h-5 mr-2" />
-                Logout
-              </Button>
-            </div>
+            {/* Title with Gradient */}
+            <h1
+              className="text-4xl font-extrabold bg-gradient-to-r from-fuchsia-600 via-blue-600 to-purple-700 text-transparent bg-clip-text tracking-tight select-none mr-8"
+              style={{ letterSpacing: ".01em" }}
+              data-testid="page-title"
+            >
+              My Digital Library
+            </h1>
+            {/* Add Book Button Large Visible */}
+            <Button
+              variant="default"
+              className="ml-auto mr-4 flex gap-2 px-6 py-2 text-lg font-semibold shadow-md bg-gradient-to-r from-fuchsia-500 to-blue-600 hover:from-fuchsia-600 hover:to-blue-700 text-white rounded-lg"
+              onClick={() => setShowAddForm(true)}
+              data-testid="add-book-button"
+            >
+              <Plus className="w-6 h-6" /> Add Book
+            </Button>
+            {/* User welcome and logout */}
+            <span className="text-base font-medium text-slate-700 pr-4 hidden md:inline-block" data-testid="welcome-message">
+              Welcome, <span className="font-semibold text-purple-800">{user?.name || 'Reader'}</span>!
+            </span>
+            <Button
+              variant="outline"
+              onClick={logout}
+              className="bg-white/70 hover:bg-white/90 border border-blue-200 text-blue-700 font-semibold px-5 py-2 absolute right-6 top-9"
+              data-testid="logout-button"
+              style={{ boxShadow: "0 1px 8px 0 rgba(124,58,237,.10)" }}
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
       </header>
       
       <main className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
         {/* ---- Search and Stats Row ---- */}
-        <div className="flex flex-col lg:flex-row gap-6 mb-10 w-full">
-          <div className="lg:w-4/6 w-full">
-            <div className="bg-white rounded-2xl px-6 py-6 shadow mb-4">
+        <div className="flex flex-col lg:flex-row gap-8 mb-12 w-full">
+          <div className="lg:w-3/5 w-full">
+            <div className="bg-white/95 rounded-3xl px-6 py-6 shadow mb-4 border border-fuchsia-100">
               <SearchBar value={searchTerm} onChange={setSearchTerm} />
             </div>
-            <div className="lg:hidden block mt-4"></div>
           </div>
-          <div className="lg:w-2/6 w-full">
-            <div className="bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl px-2 py-2 shadow">
+          <div className="lg:w-2/5 w-full">
+            <div className="bg-gradient-to-tr from-sky-50 via-blue-100 to-pink-100 rounded-3xl px-3 py-3 shadow border border-blue-100">
               <LibraryStats
                 total={stats.total}
                 reading={stats.reading}
@@ -520,24 +532,26 @@ export const LibraryDashboard = () => {
         {/* ---- Favorites Section ---- */}
         <section
           ref={favoritesRef}
-          className="pt-6 pb-8 mb-12 bg-gradient-to-tr from-yellow-50 via-white to-yellow-100 rounded-xl shadow-inner"
+          className="pt-7 pb-10 mb-14 bg-gradient-to-r from-yellow-100 via-white to-orange-50 rounded-[32px] shadow-[0_4px_32px_-8px_rgba(253,224,71,0.07)] border border-yellow-100"
           data-testid="favorites-section"
         >
-          <div className="flex items-center gap-2 mb-2 px-6">
-            <Star className="text-yellow-400" size={28} fill="#fde047" />
-            <h2 className="text-2xl md:text-3xl font-extrabold text-yellow-700 tracking-tight">Favorites</h2>
+          <div className="flex items-center gap-2 mb-4 px-8">
+            <Star className="text-yellow-400" size={32} fill="#fde047" />
+            <h2 className="text-3xl font-extrabold text-yellow-700 tracking-tight">Favorites</h2>
             <span className="ml-2 rounded bg-yellow-200 text-yellow-800 px-3 py-1 font-semibold text-xs">{stats.favorites}</span>
           </div>
-          <div className="px-6 pb-2">
+          <div className="px-8 pb-3">
             {getFavoriteBooks().length === 0 ? (
-              <div className="py-10 px-4 rounded border border-yellow-100 bg-yellow-50 text-yellow-700 text-center font-medium shadow">
+              <div className="py-12 px-4 rounded-lg border border-yellow-100 bg-yellow-50 text-yellow-700 text-center font-medium shadow">
                 <span>No favorite books yet! Click the <Star className="inline-block mb-1 text-yellow-400" size={18} fill="#fde047" /> icon to mark a book as favorite.</span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {getFavoriteBooks().map(book => (
-                  <div key={book._id} className="relative">
-                    <div className="ring-2 ring-yellow-300 rounded-lg shadow-sm">{renderBookCard(book)}</div>
+                  <div key={book._id} className="relative flex h-full">
+                    <div className="ring-2 ring-yellow-300 bg-white rounded-xl shadow-md flex-grow flex flex-col" style={{ minHeight: '260px' }}>
+                      {renderBookCard(book)}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -546,7 +560,7 @@ export const LibraryDashboard = () => {
         </section>
         {/* ---- End Favorites Section ---- */}
 
-        <div className="space-y-10">
+        <div className="space-y-12">
           <BooksSection
             title="Not Read"
             books={getBooksByStatus('not-read')}
@@ -572,6 +586,14 @@ export const LibraryDashboard = () => {
           />
         </div>
       </main>
+      {/* Add Book Modal */}
+      {showAddForm && (
+        <AddBookForm
+          open={showAddForm}
+          onOpenChange={setShowAddForm}
+          onAddBook={handleAddBook}
+        />
+      )}
     </div>
   );
 };

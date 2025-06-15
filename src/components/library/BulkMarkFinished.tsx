@@ -13,22 +13,20 @@ interface BulkMarkFinishedProps {
 export const BulkMarkFinished: React.FC<BulkMarkFinishedProps> = ({
   books, selectedIds, onToggle, onBulkMark
 }) => {
+  if (!books.length) return null;
   return (
-    <div className="mb-3 flex flex-wrap gap-4 items-center" data-testid="bulk-action-bar">
-      {books.length > 0 && (
-        <>
-          <span className="text-base font-semibold text-purple-700">Bulk Actions:</span>
-          <Button
-            variant="default"
-            disabled={selectedIds.size === 0}
-            onClick={onBulkMark}
-            data-testid="bulk-finish-btn"
-            className="h-9 px-5 text-base font-medium bg-green-600 hover:bg-green-700 text-white rounded-md transition"
-          >
-            Mark as Finished
-          </Button>
-        </>
-      )}
+    <div className="mb-4 flex flex-wrap gap-4 items-center" data-testid="bulk-action-bar">
+      <span className="text-base font-semibold text-purple-700 mr-1">Bulk Actions:</span>
+      <Button
+        variant="default"
+        size="sm"
+        disabled={selectedIds.size === 0}
+        onClick={onBulkMark}
+        data-testid="bulk-finish-btn"
+        className="text-base font-medium bg-green-600 hover:bg-green-700 text-white rounded-md transition py-2 px-4"
+      >
+        Mark as Finished
+      </Button>
     </div>
   );
 };

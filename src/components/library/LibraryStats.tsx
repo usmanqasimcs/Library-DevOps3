@@ -16,36 +16,36 @@ export const LibraryStats: React.FC<LibraryStatsProps> = ({
   total, reading, finished, notRead, favorites, onFavoritesClick
 }) => (
   <div
-    className="flex gap-3 w-full overflow-x-auto pb-2"
+    className="flex flex-col sm:flex-row gap-5 w-full overflow-x-auto pb-2"
     data-testid="stats-section"
     style={{ WebkitOverflowScrolling: 'touch' }}
   >
-    <Card className="min-w-[150px] flex-1 bg-white/95 border-blue-200 shadow">
+    <Card className="min-w-[140px] flex-1 bg-gradient-to-tr from-blue-50 via-white to-purple-50 border-blue-200 shadow">
       <CardContent className="p-3 text-center">
-        <div className="text-xl font-bold text-gray-900 truncate" data-testid="total-books">{total}</div>
-        <div className="text-xs text-gray-500">Total Books</div>
+        <div className="text-2xl font-bold text-sky-900 truncate" data-testid="total-books">{total}</div>
+        <div className="text-xs text-blue-600">Total Books</div>
       </CardContent>
     </Card>
-    <Card className="min-w-[150px] flex-1 bg-blue-50/80 border-blue-200 shadow">
+    <Card className="min-w-[140px] flex-1 bg-gradient-to-br from-blue-100 via-white to-blue-200 border-blue-200 shadow">
       <CardContent className="p-3 text-center">
-        <div className="text-xl font-bold text-blue-700" data-testid="reading-books">{reading}</div>
-        <div className="text-xs text-blue-500">Currently Reading</div>
+        <div className="text-2xl font-bold text-blue-700" data-testid="reading-books">{reading}</div>
+        <div className="text-xs text-blue-500">Reading</div>
       </CardContent>
     </Card>
-    <Card className="min-w-[150px] flex-1 bg-green-50/80 border-green-200 shadow">
+    <Card className="min-w-[140px] flex-1 bg-gradient-to-br from-green-100 via-white to-green-300 border-green-200 shadow">
       <CardContent className="p-3 text-center">
-        <div className="text-xl font-bold text-green-700" data-testid="finished-books">{finished}</div>
+        <div className="text-2xl font-bold text-green-700" data-testid="finished-books">{finished}</div>
         <div className="text-xs text-green-600">Finished</div>
       </CardContent>
     </Card>
-    <Card className="min-w-[150px] flex-1 bg-slate-50/80 border-slate-200 shadow">
+    <Card className="min-w-[140px] flex-1 bg-gradient-to-br from-slate-100 via-white to-slate-200 border-slate-200 shadow">
       <CardContent className="p-3 text-center">
-        <div className="text-xl font-bold text-slate-700" data-testid="unread-books">{notRead}</div>
+        <div className="text-2xl font-bold text-slate-700" data-testid="unread-books">{notRead}</div>
         <div className="text-xs text-slate-500">Not Read</div>
       </CardContent>
     </Card>
     <Card
-      className="min-w-[150px] flex-1 cursor-pointer border-yellow-300 hover:shadow-xl hover:bg-yellow-50 duration-150 transition-all shadow"
+      className="min-w-[140px] flex-1 cursor-pointer border-yellow-300 bg-gradient-to-tr from-yellow-100 via-white to-yellow-200 hover:shadow-xl hover:bg-yellow-50 duration-150 transition-all shadow"
       onClick={onFavoritesClick}
       tabIndex={0}
       aria-label="View favorite books"
@@ -55,10 +55,11 @@ export const LibraryStats: React.FC<LibraryStatsProps> = ({
       <CardContent className="p-3 text-center flex flex-col items-center">
         <div className="flex items-center gap-1 justify-center">
           <Star className="text-yellow-400" size={19} fill="#facc15" />
-          <span className="text-xl font-bold text-yellow-700" data-testid="favorites-books">{favorites}</span>
+          <span className="text-2xl font-bold text-yellow-700" data-testid="favorites-books">{favorites}</span>
         </div>
         <div className="text-xs text-yellow-600">Favorites</div>
       </CardContent>
     </Card>
   </div>
 );
+
