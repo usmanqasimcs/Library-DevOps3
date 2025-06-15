@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,15 @@ import { LibraryStats } from "./LibraryStats";
 import { AddBookForm } from "./AddBookForm";
 import { BooksSection } from "./BooksSection";
 import { BookCard } from "./BookCard";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectGroup,
+  SelectLabel,
+} from "@/components/ui/select";
 
 export const LibraryDashboard = () => {
   const [books, setBooks] = useState([]);
@@ -311,7 +321,7 @@ export const LibraryDashboard = () => {
       <header className="sticky top-0 z-20 bg-white shadow border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center h-24 relative">
           {/* Left: Logo and Title */}
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             <div className="p-3 rounded-full shadow bg-purple-700 flex items-center justify-center">
               <Library className="w-8 h-8 text-white" data-testid="library-icon" />
             </div>
@@ -324,15 +334,14 @@ export const LibraryDashboard = () => {
             </h1>
           </div>
           {/* Right: Logout Button flush right and always visible */}
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 flex justify-end items-center">
             <Button
               variant="destructive"
               onClick={logout}
               className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
               data-testid="logout-button"
               style={{
-                position: 'relative',
-                background: '#dc2626', // fallback in case of css issues
+                background: '#dc2626',
                 color: '#fff'
               }}
             >
@@ -344,13 +353,33 @@ export const LibraryDashboard = () => {
       </header>
       
       <main className="max-w-4xl mx-auto w-full px-2 sm:px-6 lg:px-8 py-8">
-        {/* ---- Search and Stats Row ---- */}
+        {/* ---- Search, Sort, and Stats Row ---- */}
         <div className="flex flex-col gap-8 mb-5 w-full">
+          {/* Search & Sort together in Card */}
           <div className="w-full">
-            <div className="bg-white rounded-2xl px-6 py-6 shadow-sm mb-4 border border-slate-200">
-              <SearchBar value={searchTerm} onChange={setSearchTerm} />
+            <div className="bg-white rounded-2xl px-6 py-6 shadow-sm mb-4 border border-slate-200 flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex-1 min-w-0">
+                <SearchBar value={searchTerm} onChange={setSearchTerm} />
+              </div>
+              {/* Sort Select - placed INSIDE the card */}
+              <div className="flex-shrink-0 min-w-[170px]">
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full md:min-w-[140px]">
+                    <SelectValue placeholder="Sort By" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Sort By</SelectLabel>
+                      <SelectItem value="title">Title</SelectItem>
+                      <SelectItem value="author">Author</SelectItem>
+                      <SelectItem value="status">Status</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
+          {/* Stats card */}
           <div className="w-full">
             <div className="bg-white rounded-2xl px-3 py-3 shadow-sm border border-slate-200">
               <LibraryStats
@@ -439,15 +468,6 @@ export const LibraryDashboard = () => {
           />
         </div>
       </main>
-      {/* Add Book Modal */}
-      {showAddForm && (
-        <AddBookForm
-          open={showAddForm}
-          onOpenChange={setShowAddForm}
-          onAddBook={handleAddBook}
-          onCancel={() => setShowAddForm(false)}
-        />
-      )}
     </div>
   );
 };
