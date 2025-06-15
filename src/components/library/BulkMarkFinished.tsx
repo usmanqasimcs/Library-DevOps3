@@ -14,15 +14,16 @@ export const BulkMarkFinished: React.FC<BulkMarkFinishedProps> = ({
   books, selectedIds, onToggle, onBulkMark
 }) => {
   return (
-    <div className="mb-2 flex flex-wrap gap-2 items-end" data-testid="bulk-action-bar">
+    <div className="mb-2 flex flex-wrap gap-2 items-center" data-testid="bulk-action-bar">
       {books.length > 0 && (
         <>
-          <span className="text-sm font-medium">Bulk actions:</span>
+          <span className="text-base font-semibold text-gray-700">Bulk actions:</span>
           <Button
             variant="default"
             disabled={selectedIds.size === 0}
             onClick={onBulkMark}
             data-testid="bulk-finish-btn"
+            className="h-9 px-4 text-base"
           >
             Mark as Finished
           </Button>

@@ -338,17 +338,18 @@ export const LibraryDashboard = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => startEditing(book)}
-                  className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 border-blue-600 text-blue-900 font-semibold"
                   data-testid="edit-book-button"
                 >
                   <Edit className="w-4 h-4" />
+                  <span className="ml-1">Edit</span>
                 </Button>
               )}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => toggleBookDetails(book._id)}
-                className="bg-purple-600 hover:bg-purple-700 border-purple-600 text-white"
+                className="bg-purple-100 hover:bg-purple-200 border-purple-200 text-purple-900 font-semibold"
                 data-testid="toggle-details-button"
               >
                 {expandedBookId === book._id ? (

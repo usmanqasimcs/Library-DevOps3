@@ -38,37 +38,37 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
   };
 
   return (
-    <Card className="bg-gray-900 border-gray-800 shadow-2xl">
-      <CardHeader className="bg-gradient-to-r from-purple-900 to-blue-900 rounded-t-lg">
-        <CardTitle className="text-white text-xl font-bold">✨ Add New Book</CardTitle>
+    <Card className="bg-white border-gray-200 shadow-2xl">
+      <CardHeader className="bg-gradient-to-r from-slate-100 to-slate-50 rounded-t-lg">
+        <CardTitle className="text-gray-900 text-xl font-bold">✨ Add New Book</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-gray-300 font-medium">Title *</Label>
+              <Label htmlFor="title" className="text-gray-800 font-medium">Title *</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter book title"
                 required
-                className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
+                className="bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="author" className="text-gray-300 font-medium">Author *</Label>
+              <Label htmlFor="author" className="text-gray-800 font-medium">Author *</Label>
               <Input
                 id="author"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
                 placeholder="Enter author name"
                 required
-                className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
+                className="bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="publicationYear" className="text-gray-300 font-medium">Publication Year</Label>
+              <Label htmlFor="publicationYear" className="text-gray-800 font-medium">Publication Year</Label>
               <Input
                 id="publicationYear"
                 type="number"
@@ -78,11 +78,11 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
                 placeholder="e.g. 2020"
                 min={1000}
                 max={2030}
-                className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
+                className="bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="rating" className="text-gray-300 font-medium">Rating (1-5)</Label>
+              <Label htmlFor="rating" className="text-gray-800 font-medium">Rating (1-5)</Label>
               <Input
                 id="rating"
                 type="number"
@@ -92,17 +92,17 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
                 placeholder="Rate 1-5 stars"
                 min={1}
                 max={5}
-                className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
+                className="bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="status" className="text-gray-300 font-medium">Status</Label>
+            <Label htmlFor="status" className="text-gray-800 font-medium">Status</Label>
             <select
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value as Book['status'])}
-              className="flex h-10 w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-purple-500 focus:ring-purple-500"
+              className="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-purple-500 focus:ring-purple-500"
             >
               <option value="not-read">📚 Not Read</option>
               <option value="reading">📖 Reading</option>
@@ -121,3 +121,4 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
     </Card>
   );
 };
+

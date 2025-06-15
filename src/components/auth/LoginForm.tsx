@@ -43,8 +43,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
             <BookOpen className="w-8 h-8 text-white" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-        <p className="text-gray-400">Enter your credentials to access your library</p>
+        <h1 className="text-3xl font-bold mb-2 text-purple-800 dark:text-purple-400">Welcome Back</h1>
+        <p className="text-gray-700">Enter your credentials to access your library</p>
       </div>
       
       <Card className="bg-gray-900/80 backdrop-blur-sm border-gray-700 shadow-2xl">
