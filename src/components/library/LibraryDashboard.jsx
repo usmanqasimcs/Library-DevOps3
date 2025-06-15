@@ -409,7 +409,10 @@ export const LibraryDashboard = () => {
         </section>
         {/* ---- End Favorites Section ---- */}
 
-        <div className="mt-10">
+        {/* Spacer for visible gap between Favorites and the first Books section */}
+        <div className="h-10" aria-hidden="true"></div>
+
+        <div className="mt-0">
           <BooksSection
             title="Not Read"
             books={getBooksByStatus('not-read')}
