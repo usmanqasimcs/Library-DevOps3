@@ -409,7 +409,7 @@ export const LibraryDashboard = () => {
         </section>
         {/* ---- End Favorites Section ---- */}
 
-        <div className="mt-0">
+        <div className="mt-10">
           <BooksSection
             title="Not Read"
             books={getBooksByStatus('not-read')}
