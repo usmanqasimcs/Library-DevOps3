@@ -11,6 +11,7 @@ import { BulkMarkFinished } from "./BulkMarkFinished";
 import { LibraryStats } from "./LibraryStats";
 import { AddBookForm } from "./AddBookForm";
 import { BooksSection } from "./BooksSection";
+import { BookCard } from "./BookCard";
 
 export const LibraryDashboard = () => {
   const [books, setBooks] = useState([]);
