@@ -8,9 +8,14 @@ import { Book } from '@/types/book';
 interface AddBookFormProps {
   onAddBook: (book: Omit<Book, '_id'>) => void;
   loading: boolean;
+  onCancel?: () => void; // Make Cancel available as prop
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) => {
+export const AddBookForm: React.FC<AddBookFormProps> = ({
+  onAddBook, loading, onCancel
+}) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [publicationYear, setPublicationYear] = useState<number | ''>('');
@@ -38,12 +43,12 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-gradient-to-br from-white via-blue-100/80 to-pink-100/90 bg-opacity-90 flex items-center justify-center"
+      className="fixed inset-0 z-[9999] bg-black/20 flex items-center justify-center"
       style={{ backdropFilter: 'blur(6px)' }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full border-2 border-blue-100">
-        <CardHeader className="bg-gradient-to-r from-slate-50 to-white rounded-t-2xl border-b border-slate-100">
-          <CardTitle className="text-gray-900 text-2xl font-extrabold tracking-tight py-1">✨ Add New Book</CardTitle>
+      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full border border-slate-200">
+        <CardHeader className="bg-white rounded-t-2xl border-b border-slate-100">
+          <CardTitle className="text-gray-900 text-2xl font-extrabold tracking-tight py-1">Add New Book</CardTitle>
         </CardHeader>
         <CardContent className="p-7">
           <form onSubmit={handleSubmit} className="space-y-7">
@@ -112,13 +117,24 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({ onAddBook, loading }) 
                 <option value="finished">✅ Finished</option>
               </select>
             </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg text-lg shadow-sm transition-all duration-200 transform hover:scale-105"
-            >
-              {loading ? '✨ Adding...' : '🚀 Add Book to Library'}
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold py-3 rounded-lg text-lg shadow-sm transition-all duration-200"
+              >
+                {loading ? 'Adding...' : 'Add Book to Library'}
+              </Button>
+              <Button
+                type="button"
+                onClick={onCancel}
+                variant="outline"
+                className="w-full border-gray-400 text-gray-700"
+                data-testid="cancel-add-book"
+              >
+                Cancel
+              </Button>
+            </div>
           </form>
         </CardContent>
       </div>

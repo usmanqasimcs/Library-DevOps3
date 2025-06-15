@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BulkMarkFinished } from "./BulkMarkFinished";
@@ -13,19 +12,16 @@ interface BooksSectionProps {
   renderBookCard: (book: any) => React.ReactNode;
 }
 
-export const BooksSection: React.FC<BooksSectionProps> = ({
+export const BooksSection: React.FC<BooksSectionProps & { cardBgColor?: string; cardBorderColor?: string }> = ({
   title, books, type,
   selectedIds,
   onToggleSelect,
   onBulkMark,
   renderBookCard,
+  cardBgColor = "bg-white",
+  cardBorderColor = "border-slate-200"
 }) => (
-  <section className={`
-    rounded-3xl p-7 shadow-lg mb-10 border border-slate-100 transition-all duration-200 hover:shadow-xl
-    ${type === "not-read" ? "bg-gradient-to-tr from-slate-50 via-white to-blue-50" :
-      type === "reading" ? "bg-gradient-to-tr from-blue-50 via-white to-purple-50" :
-      "bg-gradient-to-tr from-green-50 via-white to-green-100"}
-  `}>
+  <section className={`rounded-3xl p-7 shadow mb-10 ${cardBgColor} border ${cardBorderColor} transition-all duration-200`}>
     <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-7 flex items-center gap-2" data-testid={`${type}-section-title`}>
       {type === "not-read"
         ? <>📚 <span>Not Read</span> <span className="ml-2 text-base font-semibold px-2 py-1 rounded bg-slate-100 text-slate-700">{books.length}</span></>
@@ -43,7 +39,7 @@ export const BooksSection: React.FC<BooksSectionProps> = ({
       /> : null
     }
     {books.length === 0 ? (
-      <div className="rounded-lg bg-gradient-to-br from-slate-100 to-white border border-dashed border-slate-300 py-10">
+      <div className="rounded-lg bg-slate-50 border border-dashed border-slate-300 py-10">
         <p className="text-slate-400 text-center italic text-base">No books in this section</p>
       </div>
     ) : (
@@ -71,4 +67,3 @@ export const BooksSection: React.FC<BooksSectionProps> = ({
     )}
   </section>
 );
-

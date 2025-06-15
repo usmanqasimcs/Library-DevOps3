@@ -23,7 +23,7 @@ export const BulkMarkFinished: React.FC<BulkMarkFinishedProps> = ({
         disabled={selectedIds.size === 0}
         onClick={onBulkMark}
         data-testid="bulk-finish-btn"
-        className="text-base font-medium bg-green-600 hover:bg-green-700 text-white rounded-md transition py-2 px-4"
+        className="text-base font-medium bg-green-700 hover:bg-green-800 text-white rounded-md transition py-2 px-4"
       >
         Mark as Finished
       </Button>

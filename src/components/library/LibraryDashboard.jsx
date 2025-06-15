@@ -452,71 +452,66 @@ export const LibraryDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50" data-testid="loading-screen">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50" data-testid="loading-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
           <div className="text-xl text-gray-900">Loading your library...</div>
         </div>
       </div>
     );
   }
 
+  const sectionBg = "bg-white";
+  const borderColor = "border-slate-200";
+
   const stats = getBookStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-sky-50 to-pink-100" data-testid="library-dashboard">
-      <header className="sticky top-0 z-20 bg-gradient-to-r from-purple-400/70 via-sky-50/80 to-pink-100/80 shadow-lg border-b border-blue-200">
+    <div className="min-h-screen bg-slate-100" data-testid="library-dashboard">
+      {/* Header */}
+      <header className="sticky top-0 z-20 bg-white shadow border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="flex items-center h-24">
-            {/* Colored Logo container */}
-            <div className="p-3 rounded-xl mr-5 shadow bg-gradient-to-tr from-blue-500 via-purple-500 to-fuchsia-400 flex items-center justify-center">
-              <Library className="w-8 h-8 text-white drop-shadow" data-testid="library-icon" />
+          <div className="flex items-center h-24 relative">
+            {/* Logo container - now a colored circle with a Library icon */}
+            <div className="p-3 rounded-full mr-5 shadow bg-purple-700 flex items-center justify-center">
+              <Library className="w-8 h-8 text-white" data-testid="library-icon" />
             </div>
-            {/* Title with Gradient */}
+            {/* Title - now with a subtle purple gradient text */}
             <h1
-              className="text-4xl font-extrabold bg-gradient-to-r from-fuchsia-600 via-blue-600 to-purple-700 text-transparent bg-clip-text tracking-tight select-none mr-8"
+              className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-fuchsia-800 to-purple-400 tracking-tight select-none mr-8"
               style={{ letterSpacing: ".01em" }}
               data-testid="page-title"
             >
               My Digital Library
             </h1>
-            {/* Add Book Button Large Visible */}
+            {/* Logout Button placed at the far right */}
             <Button
-              variant="default"
-              className="ml-auto mr-4 flex gap-2 px-6 py-2 text-lg font-semibold shadow-md bg-gradient-to-r from-fuchsia-500 to-blue-600 hover:from-fuchsia-600 hover:to-blue-700 text-white rounded-lg"
-              onClick={() => setShowAddForm(true)}
-              data-testid="add-book-button"
-            >
-              <Plus className="w-6 h-6" /> Add Book
-            </Button>
-            {/* User welcome and logout */}
-            <span className="text-base font-medium text-slate-700 pr-4 hidden md:inline-block" data-testid="welcome-message">
-              Welcome, <span className="font-semibold text-purple-800">{user?.name || 'Reader'}</span>!
-            </span>
-            <Button
-              variant="outline"
+              variant="destructive"
               onClick={logout}
-              className="bg-white/70 hover:bg-white/90 border border-blue-200 text-blue-700 font-semibold px-5 py-2 absolute right-6 top-9"
+              className="ml-auto px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors absolute right-6 top-1/2 -translate-y-1/2"
               data-testid="logout-button"
-              style={{ boxShadow: "0 1px 8px 0 rgba(124,58,237,.10)" }}
             >
               <LogOut className="w-5 h-5 mr-2" />
               Logout
             </Button>
+            {/* Welcome text below title for larger screens */}
+            <span className="text-base font-medium text-slate-700 pr-4 hidden md:inline-block absolute left-[200px] top-1/2 -translate-y-1/2" data-testid="welcome-message">
+              Welcome, <span className="font-semibold text-purple-900">{user?.name || 'Reader'}</span>!
+            </span>
           </div>
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-4xl mx-auto w-full px-2 sm:px-6 lg:px-8 py-8">
         {/* ---- Search and Stats Row ---- */}
-        <div className="flex flex-col lg:flex-row gap-8 mb-12 w-full">
-          <div className="lg:w-3/5 w-full">
-            <div className="bg-white/95 rounded-3xl px-6 py-6 shadow mb-4 border border-fuchsia-100">
+        <div className="flex flex-col gap-8 mb-5 w-full">
+          <div className="w-full">
+            <div className="bg-white rounded-2xl px-6 py-6 shadow-sm mb-4 border border-slate-200">
               <SearchBar value={searchTerm} onChange={setSearchTerm} />
             </div>
           </div>
-          <div className="lg:w-2/5 w-full">
-            <div className="bg-gradient-to-tr from-sky-50 via-blue-100 to-pink-100 rounded-3xl px-3 py-3 shadow border border-blue-100">
+          <div className="w-full">
+            <div className="bg-white rounded-2xl px-3 py-3 shadow-sm border border-slate-200">
               <LibraryStats
                 total={stats.total}
                 reading={stats.reading}
@@ -529,27 +524,39 @@ export const LibraryDashboard = () => {
           </div>
         </div>
 
+        {/* ---- Add Book Button - below stats, purple, full width ---- */}
+        <div className="mb-8">
+          <Button
+            variant="default"
+            className="w-full py-3 text-lg font-semibold rounded-xl bg-purple-700 hover:bg-purple-800 border-none text-white shadow transition-colors"
+            onClick={() => setShowAddForm(true)}
+            data-testid="add-book-button"
+          >
+            <Plus className="w-6 h-6 mr-2" /> Add Book
+          </Button>
+        </div>
+
         {/* ---- Favorites Section ---- */}
         <section
           ref={favoritesRef}
-          className="pt-7 pb-10 mb-14 bg-gradient-to-r from-yellow-100 via-white to-orange-50 rounded-[32px] shadow-[0_4px_32px_-8px_rgba(253,224,71,0.07)] border border-yellow-100"
+          className="pt-7 pb-10 mb-14 bg-white rounded-2xl shadow border border-slate-200"
           data-testid="favorites-section"
         >
           <div className="flex items-center gap-2 mb-4 px-8">
-            <Star className="text-yellow-400" size={32} fill="#fde047" />
+            <Star className="text-yellow-500" size={32} fill="#fde047" />
             <h2 className="text-3xl font-extrabold text-yellow-700 tracking-tight">Favorites</h2>
-            <span className="ml-2 rounded bg-yellow-200 text-yellow-800 px-3 py-1 font-semibold text-xs">{stats.favorites}</span>
+            <span className="ml-2 rounded bg-yellow-100 text-yellow-800 px-3 py-1 font-semibold text-xs">{stats.favorites}</span>
           </div>
           <div className="px-8 pb-3">
             {getFavoriteBooks().length === 0 ? (
-              <div className="py-12 px-4 rounded-lg border border-yellow-100 bg-yellow-50 text-yellow-700 text-center font-medium shadow">
+              <div className="py-12 px-4 rounded-lg border border-yellow-100 bg-yellow-50 text-yellow-700 text-center font-medium shadow-none">
                 <span>No favorite books yet! Click the <Star className="inline-block mb-1 text-yellow-400" size={18} fill="#fde047" /> icon to mark a book as favorite.</span>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {getFavoriteBooks().map(book => (
-                  <div key={book._id} className="relative flex h-full">
-                    <div className="ring-2 ring-yellow-300 bg-white rounded-xl shadow-md flex-grow flex flex-col" style={{ minHeight: '260px' }}>
+                  <div key={book._id} className="relative flex h-full min-h-[280px]">
+                    <div className="ring-2 ring-yellow-300 bg-white rounded-xl shadow-md flex-grow flex flex-col min-h-[280px]">
                       {renderBookCard(book)}
                     </div>
                   </div>
@@ -569,6 +576,8 @@ export const LibraryDashboard = () => {
             onToggleSelect={handleToggleSelect}
             onBulkMark={handleBulkMarkFinished}
             renderBookCard={renderBookCard}
+            cardBgColor={sectionBg}
+            cardBorderColor={borderColor}
           />
 
           <BooksSection
@@ -576,6 +585,8 @@ export const LibraryDashboard = () => {
             books={getBooksByStatus('reading')}
             type="reading"
             renderBookCard={renderBookCard}
+            cardBgColor={sectionBg}
+            cardBorderColor={borderColor}
           />
 
           <BooksSection
@@ -583,6 +594,8 @@ export const LibraryDashboard = () => {
             books={getBooksByStatus('finished')}
             type="finished"
             renderBookCard={renderBookCard}
+            cardBgColor={sectionBg}
+            cardBorderColor={borderColor}
           />
         </div>
       </main>
@@ -592,6 +605,7 @@ export const LibraryDashboard = () => {
           open={showAddForm}
           onOpenChange={setShowAddForm}
           onAddBook={handleAddBook}
+          onCancel={() => setShowAddForm(false)}
         />
       )}
     </div>
