@@ -472,7 +472,7 @@ export const LibraryDashboard = () => {
       <header className="sticky top-0 z-20 bg-white shadow border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center h-24 relative">
           {/* Left: Logo and Title */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-1">
             <div className="p-3 rounded-full shadow bg-purple-700 flex items-center justify-center">
               <Library className="w-8 h-8 text-white" data-testid="library-icon" />
             </div>
@@ -484,19 +484,19 @@ export const LibraryDashboard = () => {
               My Digital Library
             </h1>
           </div>
-          {/* Spacer */}
-          <div className="flex-1" />
-          {/* Logout Button */}
-          <Button
-            variant="destructive"
-            onClick={logout}
-            className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
-            data-testid="logout-button"
-            style={{ position: 'relative' }}
-          >
-            <LogOut className="w-5 h-5 mr-2" />
-            Logout
-          </Button>
+          {/* Logout Button on far right */}
+          <div className="flex items-center justify-end" style={{ flex: 1 }}>
+            <Button
+              variant="destructive"
+              onClick={logout}
+              className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
+              data-testid="logout-button"
+              style={{ position: 'relative' }}
+            >
+              <LogOut className="w-5 h-5 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
       

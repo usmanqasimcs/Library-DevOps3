@@ -14,7 +14,7 @@ interface BookCardProps {
 export const BookCard: React.FC<BookCardProps & { _favoritesCard?: boolean }> = ({
   book, onStatusChange, onDelete, _favoritesCard
 }) => {
-  // Show star only inline with title (not in icon button), and only once
+  // Show star only in ONE place: with title in non-favorite card; never again
   // _favoritesCard: minimal display for favorites tab
 
   return (
@@ -24,7 +24,8 @@ export const BookCard: React.FC<BookCardProps & { _favoritesCard?: boolean }> = 
           <div className="flex-1">
             <CardTitle className="text-lg flex items-center gap-2 text-gray-900" data-testid="book-title">
               {book.title}
-              {!!book.isFavorite && (
+              {/* Only show favorite star on standard card mode, NOT on minimal favorites card */}
+              {!_favoritesCard && !!book.isFavorite && (
                 <span className="inline-block text-yellow-500" data-testid="favorite-star">
                   <Star size={18} fill="#eab308" stroke="#f59e0b" />
                 </span>
