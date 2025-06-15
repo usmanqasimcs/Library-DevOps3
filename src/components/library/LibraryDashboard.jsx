@@ -323,16 +323,20 @@ export const LibraryDashboard = () => {
               My Digital Library
             </h1>
           </div>
-          {/* Right: Logout Button at the very end/right */}
-          <div className="flex-1 flex justify-end items-center">
+          {/* Right: Logout Button absolutely at the very end/right */}
+          <div className="flex-1 flex justify-end items-center relative">
             <Button
               variant="destructive"
               onClick={logout}
               className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
               data-testid="logout-button"
               style={{
-                background: '#dc2626', // fallback in case of css issues
-                color: '#fff'
+                background: '#dc2626',
+                color: '#fff',
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
               }}
             >
               <LogOut className="w-5 h-5 mr-2 text-white" />
@@ -379,7 +383,7 @@ export const LibraryDashboard = () => {
         {/* ---- Favorites Section ---- */}
         <section
           ref={favoritesRef}
-          className="pt-7 pb-10 mb-14 bg-white rounded-2xl shadow border border-slate-200"
+          className="pt-7 pb-10 mb-20 bg-white rounded-2xl shadow border border-slate-200"
           data-testid="favorites-section"
         >
           <div className="flex items-center gap-2 mb-4 px-8">
@@ -396,7 +400,6 @@ export const LibraryDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {getFavoriteBooks().map(book => (
                   <div key={book._id} className="flex h-full min-h-[260px]">
-                    {/* Remove ring/gradient, use clean card style */}
                     {renderBookCard({ ...book, _favoritesCard: true })}
                   </div>
                 ))}
