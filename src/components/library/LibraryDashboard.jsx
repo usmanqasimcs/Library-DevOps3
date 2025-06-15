@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,9 @@ export const LibraryDashboard = () => {
   const [editingBook, setEditingBook] = useState({});
   const { user, logout } = useAuth();
   const [selectedNotReadIds, setSelectedNotReadIds] = useState(new Set());
+
+  // For scrolling to favorites
+  const favoritesRef = useRef(null);
 
   useEffect(() => {
     loadBooks();
@@ -168,7 +171,21 @@ export const LibraryDashboard = () => {
     const reading = books.filter(book => book.status === 'reading').length;
     const finished = books.filter(book => book.status === 'finished').length;
     const notRead = books.filter(book => book.status === 'not-read').length;
-    return { total, reading, finished, notRead };
+    const favorites = books.filter(book => !!book.isFavorite).length;
+    return { total, reading, finished, notRead, favorites };
+  };
+
+  const getFavoriteBooks = () => {
+    const list = Array.isArray(filteredBooks) ? filteredBooks : [];
+    return list.filter(book => book.isFavorite);
+  };
+
+  const scrollToFavorites = () => {
+    setTimeout(() => {
+      if (favoritesRef.current) {
+        favoritesRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   const getBooksByStatus = (status) => {
@@ -447,7 +464,7 @@ export const LibraryDashboard = () => {
   const stats = getBookStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" data-testid="library-dashboard">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white" data-testid="library-dashboard">
       <header className="bg-white/90 backdrop-blur-sm shadow-2xl border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -483,30 +500,32 @@ export const LibraryDashboard = () => {
           reading={stats.reading}
           finished={stats.finished}
           notRead={stats.notRead}
+          favorites={stats.favorites}
+          onFavoritesClick={scrollToFavorites}
         />
 
-        <div className="mb-8">
-          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-2xl">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-gray-900 text-xl">✨ Add New Book</CardTitle>
-                <Button 
-                  onClick={() => setShowAddForm(!showAddForm)} 
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                  data-testid="toggle-add-form"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {showAddForm ? 'Cancel' : 'Add Book'}
-                </Button>
-              </div>
-            </CardHeader>
-            {showAddForm && (
-              <CardContent>
-                <AddBookForm onAddBook={handleAddBook} loading={false} />
-              </CardContent>
-            )}
-          </Card>
+        {/* --- FAVORITES SECTION --- */}
+        <div ref={favoritesRef} className="space-y-4 pt-8 pb-2" data-testid="favorites-section">
+          <div className="flex items-center gap-2 mb-1">
+            <Star className="text-yellow-400" size={24} fill="#fde047" />
+            <h2 className="text-2xl font-semibold text-yellow-800 tracking-tight">Favorites ({stats.favorites})</h2>
+          </div>
+          {getFavoriteBooks().length === 0 ? (
+            <div className="py-8 px-4 rounded border border-yellow-200 bg-yellow-50 text-yellow-700 text-center font-medium shadow">
+              No favorite books yet! Click the <Star className="inline-block text-yellow-400 mb-1" size={18} fill="#fde047" /> icon to mark a book as favorite.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {getFavoriteBooks().map(book => (
+                <div key={book._id} className="relative">
+                  {/* Reuse renderBookCard with focus ring for favorites */}
+                  <div className="ring-yellow-300 ring-2 rounded-lg">{renderBookCard(book)}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+        {/* --- END FAVORITES SECTION --- */}
 
         <div className="space-y-8">
           <BooksSection
