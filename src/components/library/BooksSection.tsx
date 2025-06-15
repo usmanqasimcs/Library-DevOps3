@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { BulkMarkFinished } from "./BulkMarkFinished";
@@ -50,14 +51,20 @@ export const BooksSection: React.FC<BooksSectionProps & { cardBgColor?: string; 
         {books.map((book) =>
           type === "not-read" ? (
             <div key={book._id} className="relative min-h-[260px] flex flex-col">
-              <input
-                type="checkbox"
-                className="absolute right-4 top-3 z-10 w-5 h-5 accent-primary"
-                checked={selectedIds?.has(book._id)}
-                onChange={() => onToggleSelect?.(book._id)}
-                data-testid={`select-book-${book._id}`}
-              />
-              {renderBookCard(book)}
+              <div className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 accent-primary mt-2 ml-2"
+                  checked={selectedIds?.has(book._id)}
+                  onChange={() => onToggleSelect?.(book._id)}
+                  data-testid={`select-book-${book._id}`}
+                  style={{
+                    // visually align checkbox with card padding
+                    boxShadow: '0 1px 4px rgba(60,60,90,0.06)',
+                  }}
+                />
+                <div className="flex-1">{renderBookCard(book)}</div>
+              </div>
             </div>
           ) : (
             <div key={book._id} className="min-h-[260px] flex flex-col">{renderBookCard(book)}</div>
@@ -67,3 +74,4 @@ export const BooksSection: React.FC<BooksSectionProps & { cardBgColor?: string; 
     )}
   </section>
 );
+
