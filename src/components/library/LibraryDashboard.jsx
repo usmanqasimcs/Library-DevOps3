@@ -452,7 +452,7 @@ export const LibraryDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" data-testid="loading-screen">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" data-testid="loading-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
           <div className="text-xl text-gray-900">Loading your library...</div>
@@ -464,27 +464,29 @@ export const LibraryDashboard = () => {
   const stats = getBookStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white" data-testid="library-dashboard">
-      <header className="bg-white/90 backdrop-blur-sm shadow-2xl border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+    <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-slate-100" data-testid="library-dashboard">
+      <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center h-20 gap-3 md:gap-0">
             <div className="flex items-center">
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-2 rounded-lg mr-3">
-                <Library className="w-6 h-6 text-white" data-testid="library-icon" />
+              <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-xl mr-4 shadow">
+                <Library className="w-7 h-7 text-white" data-testid="library-icon" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">My Digital Library</h1>
+              <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight" data-testid="page-title">
+                My Digital Library
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600" data-testid="welcome-message">
-                Welcome, {user?.name || 'Reader'}! 📚
+              <span className="text-base font-medium text-gray-700" data-testid="welcome-message">
+                Welcome, <span className="font-semibold text-purple-700">{user?.name || 'Reader'}</span>!
               </span>
-              <Button 
-                variant="outline" 
-                onClick={logout} 
-                className="bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-900"
+              <Button
+                variant="outline"
+                onClick={logout}
+                className="bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-800 font-semibold px-4 py-2"
                 data-testid="logout-button"
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-5 h-5 mr-2" />
                 Logout
               </Button>
             </div>
@@ -492,42 +494,59 @@ export const LibraryDashboard = () => {
         </div>
       </header>
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <SearchBar value={searchTerm} onChange={setSearchTerm} />
-        
-        <LibraryStats
-          total={stats.total}
-          reading={stats.reading}
-          finished={stats.finished}
-          notRead={stats.notRead}
-          favorites={stats.favorites}
-          onFavoritesClick={scrollToFavorites}
-        />
-
-        {/* --- FAVORITES SECTION --- */}
-        <div ref={favoritesRef} className="space-y-4 pt-8 pb-2" data-testid="favorites-section">
-          <div className="flex items-center gap-2 mb-1">
-            <Star className="text-yellow-400" size={24} fill="#fde047" />
-            <h2 className="text-2xl font-semibold text-yellow-800 tracking-tight">Favorites ({stats.favorites})</h2>
+      <main className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
+        {/* ---- Search and Stats Row ---- */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-10 w-full">
+          <div className="lg:w-4/6 w-full">
+            <div className="bg-white rounded-2xl px-6 py-6 shadow mb-4">
+              <SearchBar value={searchTerm} onChange={setSearchTerm} />
+            </div>
+            <div className="lg:hidden block mt-4"></div>
           </div>
-          {getFavoriteBooks().length === 0 ? (
-            <div className="py-8 px-4 rounded border border-yellow-200 bg-yellow-50 text-yellow-700 text-center font-medium shadow">
-              No favorite books yet! Click the <Star className="inline-block text-yellow-400 mb-1" size={18} fill="#fde047" /> icon to mark a book as favorite.
+          <div className="lg:w-2/6 w-full">
+            <div className="bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl px-2 py-2 shadow">
+              <LibraryStats
+                total={stats.total}
+                reading={stats.reading}
+                finished={stats.finished}
+                notRead={stats.notRead}
+                favorites={stats.favorites}
+                onFavoritesClick={scrollToFavorites}
+              />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {getFavoriteBooks().map(book => (
-                <div key={book._id} className="relative">
-                  {/* Reuse renderBookCard with focus ring for favorites */}
-                  <div className="ring-yellow-300 ring-2 rounded-lg">{renderBookCard(book)}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          </div>
         </div>
-        {/* --- END FAVORITES SECTION --- */}
 
-        <div className="space-y-8">
+        {/* ---- Favorites Section ---- */}
+        <section
+          ref={favoritesRef}
+          className="pt-6 pb-8 mb-12 bg-gradient-to-tr from-yellow-50 via-white to-yellow-100 rounded-xl shadow-inner"
+          data-testid="favorites-section"
+        >
+          <div className="flex items-center gap-2 mb-2 px-6">
+            <Star className="text-yellow-400" size={28} fill="#fde047" />
+            <h2 className="text-2xl md:text-3xl font-extrabold text-yellow-700 tracking-tight">Favorites</h2>
+            <span className="ml-2 rounded bg-yellow-200 text-yellow-800 px-3 py-1 font-semibold text-xs">{stats.favorites}</span>
+          </div>
+          <div className="px-6 pb-2">
+            {getFavoriteBooks().length === 0 ? (
+              <div className="py-10 px-4 rounded border border-yellow-100 bg-yellow-50 text-yellow-700 text-center font-medium shadow">
+                <span>No favorite books yet! Click the <Star className="inline-block mb-1 text-yellow-400" size={18} fill="#fde047" /> icon to mark a book as favorite.</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {getFavoriteBooks().map(book => (
+                  <div key={book._id} className="relative">
+                    <div className="ring-2 ring-yellow-300 rounded-lg shadow-sm">{renderBookCard(book)}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+        {/* ---- End Favorites Section ---- */}
+
+        <div className="space-y-10">
           <BooksSection
             title="Not Read"
             books={getBooksByStatus('not-read')}
