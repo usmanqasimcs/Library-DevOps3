@@ -409,7 +409,7 @@ export const LibraryDashboard = () => {
         </section>
         {/* ---- End Favorites Section ---- */}
 
-        <div className="space-y-12">
+        <div className="mt-10">
           <BooksSection
             title="Not Read"
             books={getBooksByStatus('not-read')}
@@ -420,7 +420,6 @@ export const LibraryDashboard = () => {
             renderBookCard={renderBookCard}
             cardBgColor={sectionBg}
             cardBorderColor={borderColor}
-            className="mt-10"
           />
 
           <BooksSection
