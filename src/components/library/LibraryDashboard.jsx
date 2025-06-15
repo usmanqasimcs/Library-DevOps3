@@ -470,35 +470,33 @@ export const LibraryDashboard = () => {
     <div className="min-h-screen bg-slate-100" data-testid="library-dashboard">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-white shadow border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <div className="flex items-center h-24 relative">
-            {/* Logo container - now a colored circle with a Library icon */}
-            <div className="p-3 rounded-full mr-5 shadow bg-purple-700 flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center h-24 relative">
+          {/* Left: Logo and Title */}
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full shadow bg-purple-700 flex items-center justify-center">
               <Library className="w-8 h-8 text-white" data-testid="library-icon" />
             </div>
-            {/* Title - now with a subtle purple gradient text */}
             <h1
-              className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-fuchsia-800 to-purple-400 tracking-tight select-none mr-8"
+              className="text-4xl font-extrabold text-purple-800 tracking-tight select-none"
               style={{ letterSpacing: ".01em" }}
               data-testid="page-title"
             >
               My Digital Library
             </h1>
-            {/* Logout Button placed at the far right */}
-            <Button
-              variant="destructive"
-              onClick={logout}
-              className="ml-auto px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors absolute right-6 top-1/2 -translate-y-1/2"
-              data-testid="logout-button"
-            >
-              <LogOut className="w-5 h-5 mr-2" />
-              Logout
-            </Button>
-            {/* Welcome text below title for larger screens */}
-            <span className="text-base font-medium text-slate-700 pr-4 hidden md:inline-block absolute left-[200px] top-1/2 -translate-y-1/2" data-testid="welcome-message">
-              Welcome, <span className="font-semibold text-purple-900">{user?.name || 'Reader'}</span>!
-            </span>
           </div>
+          {/* Spacer */}
+          <div className="flex-1" />
+          {/* Logout Button */}
+          <Button
+            variant="destructive"
+            onClick={logout}
+            className="px-5 py-2 text-base font-semibold rounded-lg bg-red-600 hover:bg-red-700 border-none text-white shadow transition-colors"
+            data-testid="logout-button"
+            style={{ position: 'relative' }}
+          >
+            <LogOut className="w-5 h-5 mr-2" />
+            Logout
+          </Button>
         </div>
       </header>
       
@@ -524,7 +522,7 @@ export const LibraryDashboard = () => {
           </div>
         </div>
 
-        {/* ---- Add Book Button - below stats, purple, full width ---- */}
+        {/* ---- Add Book Button - below stats, full width, purple ---- */}
         <div className="mb-8">
           <Button
             variant="default"
@@ -555,10 +553,9 @@ export const LibraryDashboard = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
                 {getFavoriteBooks().map(book => (
-                  <div key={book._id} className="relative flex h-full min-h-[280px]">
-                    <div className="ring-2 ring-yellow-300 bg-white rounded-xl shadow-md flex-grow flex flex-col min-h-[280px]">
-                      {renderBookCard(book)}
-                    </div>
+                  <div key={book._id} className="flex h-full min-h-[260px]">
+                    {/* Remove ring/gradient, use clean card style */}
+                    {renderBookCard({ ...book, _favoritesCard: true })}
                   </div>
                 ))}
               </div>
