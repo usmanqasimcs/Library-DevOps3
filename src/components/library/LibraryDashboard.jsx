@@ -245,10 +245,10 @@ export const LibraryDashboard = () => {
     return (
       <Card
         key={book._id}
-        className={`transition-all duration-300 hover:shadow-2xl relative border-2 bg-gray-900/900 backdrop-blur-sm ${
+        className={`transition-all duration-300 hover:shadow-2xl relative border-2 bg-white/95 backdrop-blur-sm ${
           isFavorite 
             ? 'border-yellow-400 shadow-yellow-400/20' 
-            : 'border-gray-700 hover:border-purple-500'
+            : 'border-gray-300 hover:border-blue-500'
         }`}
         data-testid={`book-card-${book._id}`}
       >
@@ -258,21 +258,21 @@ export const LibraryDashboard = () => {
               {editingBookId === book._id ? (
                 <div className="space-y-3">
                   <input
-                    className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm font-semibold text-white focus:border-purple-500"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-900 focus:border-blue-500"
                     value={editingBook.title || ''}
                     onChange={(e) => setEditingBook({...editingBook, title: e.target.value})}
                     placeholder="Book title"
                     data-testid="edit-title-input"
                   />
                   <input
-                    className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-purple-500"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
                     value={editingBook.author || ''}
                     onChange={(e) => setEditingBook({...editingBook, author: e.target.value})}
                     placeholder="Author name"
                     data-testid="edit-author-input"
                   />
                   <select
-                    className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-purple-500"
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
                     value={editingBook.status || ''}
                     onChange={(e) => setEditingBook({...editingBook, status: e.target.value})}
                     data-testid="edit-status-select"
@@ -284,15 +284,15 @@ export const LibraryDashboard = () => {
                 </div>
               ) : (
                 <>
-                  <CardTitle className="text-lg flex items-center gap-2 text-white" data-testid="book-title">
+                  <CardTitle className="text-lg flex items-center gap-2 text-gray-900" data-testid="book-title">
                     {book.title}
                     {isFavorite && (
-                      <span className="inline-block text-yellow-400" data-testid="favorite-star">
-                        <Star size={16} fill="#facc15" stroke="#fde047" />
+                      <span className="inline-block text-yellow-500" data-testid="favorite-star">
+                        <Star size={16} fill="#eab308" stroke="#f59e0b" />
                       </span>
                     )}
                   </CardTitle>
-                  <p className="text-gray-300 mt-1" data-testid="book-author">by {book.author}</p>
+                  <p className="text-gray-600 mt-1" data-testid="book-author">by {book.author}</p>
                   <Badge className={`${getStatusColor(book.status)} mt-2 w-fit`}>
                     {book.status === 'not-read' ? '📚' : book.status === 'reading' ? '📖' : '✅'} {book.status.replace('-', ' ').toUpperCase()}
                   </Badge>
@@ -305,12 +305,12 @@ export const LibraryDashboard = () => {
                 size="icon"
                 onClick={() => toggleFavorite(book._id)}
                 aria-label={isFavorite ? "Unfavorite book" : "Mark as favorite"}
-                className="p-2 hover:bg-gray-800"
+                className="p-2 hover:bg-gray-100"
                 data-testid="favorite-toggle"
               >
                 {isFavorite 
-                  ? <Star size={20} fill="#facc15" stroke="#fde047" /> 
-                  : <StarOff size={20} className="text-gray-400 hover:text-yellow-400" />}
+                  ? <Star size={20} fill="#eab308" stroke="#f59e0b" /> 
+                  : <StarOff size={20} className="text-gray-400 hover:text-yellow-500" />}
               </Button>
               {editingBookId === book._id ? (
                 <>
@@ -376,15 +376,15 @@ export const LibraryDashboard = () => {
           </div>
         </CardHeader>
         {expandedBookId === book._id && (
-          <CardContent className="pt-0 border-t border-gray-700" data-testid="book-details">
+          <CardContent className="pt-0 border-t border-gray-200" data-testid="book-details">
             {editingBookId === book._id ? (
               <div className="pt-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Publication Year</label>
+                    <label className="text-sm font-medium text-gray-600">Publication Year</label>
                     <input
                       type="number"
-                      className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-purple-500"
+                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
                       value={editingBook.publicationYear || ''}
                       onChange={(e) => setEditingBook({...editingBook, publicationYear: parseInt(e.target.value) || ''})}
                       placeholder="Enter year"
@@ -394,10 +394,10 @@ export const LibraryDashboard = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-300">Rating (1-5)</label>
+                    <label className="text-sm font-medium text-gray-600">Rating (1-5)</label>
                     <input
                       type="number"
-                      className="flex h-10 w-full rounded-md border border-gray-600 bg-gray-800 px-3 py-2 text-sm text-white focus:border-purple-500"
+                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500"
                       value={editingBook.rating || ''}
                       onChange={(e) => setEditingBook({...editingBook, rating: parseInt(e.target.value) || ''})}
                       placeholder="Rate 1-5"
@@ -412,14 +412,14 @@ export const LibraryDashboard = () => {
               <div className="pt-4">
                 <div className="grid grid-cols-2 gap-6 text-sm">
                   <div>
-                    <span className="font-medium text-gray-400">Publication Year:</span>
-                    <p className="text-white font-medium" data-testid="book-year">
+                    <span className="font-medium text-gray-500">Publication Year:</span>
+                    <p className="text-gray-900 font-medium" data-testid="book-year">
                       {book.publicationYear ? `📅 ${book.publicationYear}` : 'Not specified'}
                     </p>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-400">Rating:</span>
-                    <p className="text-white font-medium" data-testid="book-rating">
+                    <span className="font-medium text-gray-500">Rating:</span>
+                    <p className="text-gray-900 font-medium" data-testid="book-rating">
                       {book.rating ? `⭐ ${book.rating}/5` : 'Not rated'}
                     </p>
                   </div>
@@ -434,10 +434,10 @@ export const LibraryDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" data-testid="loading-screen">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" data-testid="loading-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-          <div className="text-xl text-white">Loading your library...</div>
+          <div className="text-xl text-gray-900">Loading your library...</div>
         </div>
       </div>
     );
@@ -446,24 +446,24 @@ export const LibraryDashboard = () => {
   const stats = getBookStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" data-testid="library-dashboard">
-      <header className="bg-slate-900/90 backdrop-blur-sm shadow-2xl border-b border-slate-600">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" data-testid="library-dashboard">
+      <header className="bg-white/90 backdrop-blur-sm shadow-2xl border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-2 rounded-lg mr-3">
                 <Library className="w-6 h-6 text-white" data-testid="library-icon" />
               </div>
-              <h1 className="text-2xl font-bold text-white" data-testid="page-title">My Digital Library</h1>
+              <h1 className="text-2xl font-bold text-gray-900" data-testid="page-title">My Digital Library</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-300" data-testid="welcome-message">
+              <span className="text-sm text-gray-600" data-testid="welcome-message">
                 Welcome, {user?.name || 'Reader'}! 📚
               </span>
               <Button 
                 variant="outline" 
                 onClick={logout} 
-                className="bg-gray-800 hover:bg-gray-700 border-gray-600 text-white"
+                className="bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-900"
                 data-testid="logout-button"
               >
                 <LogOut className="w-4 h-4 mr-2" />
@@ -485,10 +485,10 @@ export const LibraryDashboard = () => {
         />
 
         <div className="mb-8">
-          <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-600 shadow-2xl">
+          <Card className="bg-white/80 backdrop-blur-sm border-gray-200 shadow-2xl">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-white text-xl">✨ Add New Book</CardTitle>
+                <CardTitle className="text-gray-900 text-xl">✨ Add New Book</CardTitle>
                 <Button 
                   onClick={() => setShowAddForm(!showAddForm)} 
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
