@@ -383,7 +383,7 @@ export const LibraryDashboard = () => {
         {/* ---- Favorites Section ---- */}
         <section
           ref={favoritesRef}
-          className="pt-7 pb-10 mb-20 bg-white rounded-2xl shadow border border-slate-200"
+          className="pt-7 pb-10 mb-12 bg-white rounded-2xl shadow border border-slate-200"
           data-testid="favorites-section"
         >
           <div className="flex items-center gap-2 mb-4 px-8">
@@ -409,7 +409,7 @@ export const LibraryDashboard = () => {
         </section>
         {/* ---- End Favorites Section ---- */}
 
-        <div className="mt-10">
+        <div className="mt-0">
           <BooksSection
             title="Not Read"
             books={getBooksByStatus('not-read')}
