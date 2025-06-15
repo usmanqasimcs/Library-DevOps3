@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -246,7 +245,7 @@ export const LibraryDashboard = () => {
     return (
       <Card
         key={book._id}
-        className={`transition-all duration-300 hover:shadow-2xl relative border-2 bg-gray-900/90 backdrop-blur-sm ${
+        className={`transition-all duration-300 hover:shadow-2xl relative border-2 bg-gray-900/900 backdrop-blur-sm ${
           isFavorite 
             ? 'border-yellow-400 shadow-yellow-400/20' 
             : 'border-gray-700 hover:border-purple-500'
@@ -435,9 +434,9 @@ export const LibraryDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900" data-testid="loading-screen">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" data-testid="loading-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
           <div className="text-xl text-white">Loading your library...</div>
         </div>
       </div>
@@ -447,8 +446,8 @@ export const LibraryDashboard = () => {
   const stats = getBookStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900" data-testid="library-dashboard">
-      <header className="bg-gray-900/80 backdrop-blur-sm shadow-2xl border-b border-gray-700">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" data-testid="library-dashboard">
+      <header className="bg-slate-900/90 backdrop-blur-sm shadow-2xl border-b border-slate-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -486,7 +485,7 @@ export const LibraryDashboard = () => {
         />
 
         <div className="mb-8">
-          <Card className="bg-gray-900/80 backdrop-blur-sm border-gray-700 shadow-2xl">
+          <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-600 shadow-2xl">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-white text-xl">✨ Add New Book</CardTitle>
