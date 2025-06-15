@@ -268,9 +268,11 @@ export const LibraryDashboard = () => {
       <div className="flex h-full min-h-[260px]">
         <BookCard
           book={book}
-          onStatusChange={(id, status) => handleUpdateBookStatus(id, status)} // use your own handler
+          onStatusChange={(id, status) => handleUpdateBookStatus(id, status)}
           onDelete={handleDeleteBook}
           _favoritesCard={isFavoriteTabCard}
+          // Only pass onToggleFavorite if not in favorites card (button hidden there)
+          onToggleFavorite={!isFavoriteTabCard ? toggleFavorite : undefined}
         />
       </div>
     );
