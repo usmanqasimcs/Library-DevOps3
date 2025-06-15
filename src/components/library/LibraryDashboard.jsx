@@ -420,6 +420,7 @@ export const LibraryDashboard = () => {
             renderBookCard={renderBookCard}
             cardBgColor={sectionBg}
             cardBorderColor={borderColor}
+            className="mt-10"
           />
 
           <BooksSection
