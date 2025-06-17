@@ -5,13 +5,13 @@ Update these values according to your deployment
 """
 
 # Your EC2 instance details
-BASE_URL = "http://your-ec2-ip:port"  # Update this with your actual URL
+BASE_URL = "http://13.48.190.148:4000"
 
 # Test user credentials (make sure this user exists in your database)
 TEST_CREDENTIALS = {
-    "email": "test@example.com",
-    "password": "testpassword123", 
-    "name": "Test User"
+    "email": "usmanqasim073@gmail.com",
+    "password": "usmanqasim073", 
+    "name": "Usman Qasim"
 }
 
 # Test data for creating books

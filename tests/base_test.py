@@ -23,13 +23,13 @@ class BaseTest(unittest.TestCase):
         cls.driver.implicitly_wait(10)
         cls.wait = WebDriverWait(cls.driver, 10)
         
-        # Replace with your actual deployed URL
-        cls.BASE_URL = "http://your-ec2-instance-ip:port"  # Update this!
+        # Updated with your actual deployed URL
+        cls.BASE_URL = "http://13.48.190.148:4000"
         
-        # Test credentials
-        cls.TEST_EMAIL = "test@example.com"
-        cls.TEST_PASSWORD = "testpassword123"
-        cls.TEST_NAME = "Test User"
+        # Updated test credentials
+        cls.TEST_EMAIL = "usmanqasim073@gmail.com"
+        cls.TEST_PASSWORD = "usmanqasim073"
+        cls.TEST_NAME = "Usman Qasim"
 
     @classmethod
     def tearDownClass(cls):
