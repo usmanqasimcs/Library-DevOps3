@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -54,6 +53,68 @@ pipeline {
                             echo "Waiting for application... attempt $i"
                             sleep 10
                         done
+                        
+                        # Final check
+                        if curl -f http://localhost:4000 > /dev/null 2>&1; then
+                            echo "✅ Application is responding on port 4000"
+                        else
+                            echo "⚠️  Application may not be fully ready"
+                        fi
+                    '''
+                }
+            }
+        }
+
+        stage('Setup Test Environment') {
+            steps {
+                dir('/var/lib/jenkins/DevOps/php/') {
+                    sh '''
+                        echo "🔧 Setting up test environment..."
+                        
+                        # Install Python and pip if not present
+                        if ! command -v python3 &> /dev/null; then
+                            echo "Installing Python3..."
+                            sudo apt-get update
+                            sudo apt-get install -y python3 python3-pip
+                        fi
+                        
+                        # Verify tests directory exists
+                        if [ ! -d "tests" ]; then
+                            echo "❌ ERROR: tests directory not found in repository!"
+                            echo "Repository contents:"
+                            ls -la
+                            exit 1
+                        fi
+                        
+                        echo "✅ Tests directory found"
+                        echo "Test files:"
+                        ls -la tests/
+                        
+                        # Install Python dependencies
+                        echo "Installing Python dependencies..."
+                        pip3 install -r tests/requirements.txt
+                        
+                        # Install Chrome if not present
+                        if ! command -v google-chrome &> /dev/null; then
+                            echo "Installing Google Chrome..."
+                            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+                            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+                            sudo apt-get update
+                            sudo apt-get install -y google-chrome-stable
+                        fi
+                        
+                        # Install ChromeDriver if not present
+                        if ! command -v chromedriver &> /dev/null; then
+                            echo "Installing ChromeDriver..."
+                            sudo apt-get install -y chromium-chromedriver
+                        fi
+                        
+                        # Verify installations
+                        echo "🔍 Verifying installations:"
+                        python3 --version
+                        google-chrome --version
+                        chromedriver --version
+                        echo "✅ Environment setup complete"
                     '''
                 }
             }
@@ -63,44 +124,48 @@ pipeline {
             steps {
                 dir('/var/lib/jenkins/DevOps/php/') {
                     sh '''
-                        # Install Python and pip if not present
-                        if ! command -v python3 &> /dev/null; then
-                            sudo apt-get update
-                            sudo apt-get install -y python3 python3-pip
-                        fi
+                        echo "🚀 Starting Selenium Test Execution..."
+                        echo "=============================================="
                         
-                        # Install test dependencies
-                        pip3 install -r tests/requirements.txt
-                        
-                        # Install Chrome if not present
-                        if ! command -v google-chrome &> /dev/null; then
-                            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-                            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-                            sudo apt-get update
-                            sudo apt-get install -y google-chrome-stable
-                        fi
-                        
-                        # Install ChromeDriver if not present
-                        if ! command -v chromedriver &> /dev/null; then
-                            sudo apt-get install -y chromium-chromedriver
-                        fi
-                        
-                        # Update the base test configuration with local URL
-                        sed -i 's|http://your-ec2-instance-ip:port|http://localhost:4000|g' tests/base_test.py
-                        
-                        # Run all tests using the test runner
-                        echo "Starting Selenium tests..."
+                        # Navigate to tests directory
                         cd tests
-                        python3 run_all_tests.py || true
                         
-                        # Also run individual tests for detailed output
-                        echo "Running individual test files..."
-                        for test_file in test_*.py; do
-                            if [ "$test_file" != "test_*.py" ] && [ "$test_file" != "run_all_tests.py" ]; then
-                                echo "Running $test_file..."
-                                python3 "$test_file" || true
-                            fi
-                        done
+                        # Update test configuration for local testing
+                        echo "📝 Updating test configuration..."
+                        sed -i 's|http://localhost:4000|http://localhost:4000|g' test_library_complete.py
+                        
+                        # Show test configuration
+                        echo "🔧 Test Configuration:"
+                        echo "  Target URL: http://localhost:4000"
+                        echo "  Test File: test_library_complete.py"
+                        echo "  Test Cases: 10"
+                        echo "  Mode: Headless Chrome"
+                        
+                        # Set Python path
+                        export PYTHONPATH=$PYTHONPATH:$(pwd)
+                        
+                        # Run the comprehensive test suite
+                        echo ""
+                        echo "🧪 Executing Test Suite..."
+                        echo "=============================================="
+                        
+                        python3 test_library_complete.py
+                        
+                        # Capture exit code but don't fail the pipeline
+                        TEST_EXIT_CODE=$?
+                        
+                        echo ""
+                        echo "=============================================="
+                        echo "🏁 Test Execution Completed"
+                        echo "Exit Code: $TEST_EXIT_CODE"
+                        echo "=============================================="
+                        
+                        # Show any screenshots that were created
+                        echo "📸 Screenshots created:"
+                        ls -la /tmp/*.png 2>/dev/null || echo "No screenshots found"
+                        
+                        # Return success regardless of test results for pipeline continuation
+                        exit 0
                     '''
                 }
             }
@@ -111,17 +176,36 @@ pipeline {
         always {
             dir('/var/lib/jenkins/DevOps/php/') {
                 sh '''
-                    echo "Collecting test results..."
-                    # Archive any test results or screenshots if generated
-                    # docker compose -p libraryapp logs > docker-logs.txt
+                    echo "🧹 Post-execution cleanup and reporting..."
+                    
+                    # Show application status
+                    echo "📊 Application Status:"
+                    docker compose -p libraryapp ps
+                    
+                    # Check for screenshots
+                    echo "📸 Test Screenshots:"
+                    if ls /tmp/*.png >/dev/null 2>&1; then
+                        ls -la /tmp/*.png
+                        echo "Screenshots available in /tmp/ directory"
+                    else
+                        echo "No screenshots generated"
+                    fi
+                    
+                    # Show test directory contents
+                    echo "📁 Test Directory Contents:"
+                    ls -la tests/
+                    
+                    # Optional: Show recent application logs (uncomment if needed)
+                    # echo "📋 Recent Application Logs:"
+                    # docker compose -p libraryapp logs --tail=20
                 '''
             }
         }
         failure {
-            echo 'Pipeline failed! Check the logs for details.'
+            echo '❌ Pipeline failed! Check the console output for details.'
         }
         success {
-            echo 'All tests passed successfully!'
+            echo '✅ Pipeline completed successfully! Check test results in console output.'
         }
     }
 }
