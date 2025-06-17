@@ -184,7 +184,7 @@ class LibrarySeleniumTests(unittest.TestCase):
             
             # Verify page loaded
             current_url = self.driver.current_url
-            self.assertEqual(current_url, self.BASE_URL, "WebDriver should navigate to correct URL")
+            self.assertEqual(current_url.rstrip('/'), self.BASE_URL.rstrip('/'), "WebDriver should navigate to correct URL")
             
             # Check page title using Selenium
             title = self.driver.title
