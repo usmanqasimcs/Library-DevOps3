@@ -60,8 +60,8 @@ pipeline {
             steps {
                 dir('/var/lib/jenkins/DevOps/php/') {
                     sh '''
-                        echo "🔧 Installing Selenium and running tests with system pip3..."
-                        pip3 install --user selenium==4.15.0 webdriver-manager==4.0.1
+                        echo "🔧 Installing Selenium and running tests with pip3..."
+                        pip3 install --break-system-packages selenium==4.15.0 webdriver-manager==4.0.1
                         export PATH=$PATH:$HOME/.local/bin
                         cd tests
                         python3 test_library_complete.py || echo "Selenium tests completed with some failures"
