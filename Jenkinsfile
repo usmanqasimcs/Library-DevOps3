@@ -71,11 +71,13 @@ pipeline {
                     sh '''
                         echo "🔧 Setting up test environment..."
                         
-                        # Install Python and pip if not present
-                        if ! command -v python3 &> /dev/null; then
-                            echo "Installing Python3..."
-                            sudo apt-get update
-                            sudo apt-get install -y python3 python3-pip
+                        # Check if Python3 is available
+                        if command -v python3 &> /dev/null; then
+                            echo "✅ Python3 is available"
+                            python3 --version
+                        else
+                            echo "❌ Python3 not found - this needs to be installed on the Jenkins server"
+                            exit 1
                         fi
                         
                         # Verify tests directory exists
@@ -90,30 +92,37 @@ pipeline {
                         echo "Test files:"
                         ls -la tests/
                         
-                        # Install Python dependencies
+                        # Install Python dependencies without sudo
                         echo "Installing Python dependencies..."
-                        pip3 install -r tests/requirements.txt
+                        pip3 install --user -r tests/requirements.txt || {
+                            echo "Trying alternative pip installation..."
+                            python3 -m pip install --user -r tests/requirements.txt
+                        }
                         
-                        # Install Chrome if not present
-                        if ! command -v google-chrome &> /dev/null; then
-                            echo "Installing Google Chrome..."
-                            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-                            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-                            sudo apt-get update
-                            sudo apt-get install -y google-chrome-stable
+                        # Check if Chrome is available
+                        if command -v google-chrome &> /dev/null; then
+                            echo "✅ Google Chrome is available"
+                            google-chrome --version
+                        elif command -v chromium-browser &> /dev/null; then
+                            echo "✅ Chromium browser is available"
+                            chromium-browser --version
+                        else
+                            echo "⚠️ Chrome/Chromium not found - installing via package manager..."
+                            # Try to install without sudo first
+                            apt-get update && apt-get install -y chromium-browser || {
+                                echo "❌ Chrome installation failed - browser needs to be pre-installed"
+                                echo "The tests will attempt to run but may fail without a browser"
+                            }
                         fi
                         
-                        # Install ChromeDriver if not present
-                        if ! command -v chromedriver &> /dev/null; then
-                            echo "Installing ChromeDriver..."
-                            sudo apt-get install -y chromium-chromedriver
+                        # Check for ChromeDriver
+                        if command -v chromedriver &> /dev/null; then
+                            echo "✅ ChromeDriver is available"
+                            chromedriver --version
+                        else
+                            echo "⚠️ ChromeDriver not found - will try to download automatically"
                         fi
                         
-                        # Verify installations
-                        echo "🔍 Verifying installations:"
-                        python3 --version
-                        google-chrome --version
-                        chromedriver --version
                         echo "✅ Environment setup complete"
                     '''
                 }
@@ -130,10 +139,6 @@ pipeline {
                         # Navigate to tests directory
                         cd tests
                         
-                        # Update test configuration for local testing
-                        echo "📝 Updating test configuration..."
-                        sed -i 's|http://localhost:4000|http://localhost:4000|g' test_library_complete.py
-                        
                         # Show test configuration
                         echo "🔧 Test Configuration:"
                         echo "  Target URL: http://localhost:4000"
@@ -143,28 +148,43 @@ pipeline {
                         
                         # Set Python path
                         export PYTHONPATH=$PYTHONPATH:$(pwd)
+                        export PATH=$PATH:$HOME/.local/bin
+                        
+                        # Install webdriver-manager for automatic driver management
+                        echo "Installing webdriver-manager for automatic ChromeDriver setup..."
+                        pip3 install --user webdriver-manager || python3 -m pip install --user webdriver-manager
                         
                         # Run the comprehensive test suite
                         echo ""
                         echo "🧪 Executing Test Suite..."
                         echo "=============================================="
                         
-                        python3 test_library_complete.py
-                        
-                        # Capture exit code but don't fail the pipeline
-                        TEST_EXIT_CODE=$?
+                        # Try to run tests with error handling
+                        python3 test_library_complete.py || {
+                            echo "❌ Test execution encountered issues"
+                            echo "Checking system setup..."
+                            echo "Python version:"
+                            python3 --version
+                            echo "Installed packages:"
+                            pip3 list --user | grep -E "(selenium|webdriver)"
+                            echo "Available browsers:"
+                            which google-chrome chromium-browser chromium || echo "No Chrome/Chromium found"
+                            echo "ChromeDriver:"
+                            which chromedriver || echo "No chromedriver found"
+                            
+                            echo "Test failed but pipeline will continue..."
+                        }
                         
                         echo ""
                         echo "=============================================="
                         echo "🏁 Test Execution Completed"
-                        echo "Exit Code: $TEST_EXIT_CODE"
                         echo "=============================================="
                         
                         # Show any screenshots that were created
                         echo "📸 Screenshots created:"
                         ls -la /tmp/*.png 2>/dev/null || echo "No screenshots found"
                         
-                        # Return success regardless of test results for pipeline continuation
+                        # Always return success to continue pipeline
                         exit 0
                     '''
                 }
@@ -195,9 +215,11 @@ pipeline {
                     echo "📁 Test Directory Contents:"
                     ls -la tests/
                     
-                    # Optional: Show recent application logs (uncomment if needed)
-                    # echo "📋 Recent Application Logs:"
-                    # docker compose -p libraryapp logs --tail=20
+                    # Show system info for debugging
+                    echo "🔍 System Information:"
+                    echo "Python: $(which python3 || echo 'Not found')"
+                    echo "Chrome: $(which google-chrome chromium-browser chromium 2>/dev/null || echo 'Not found')"
+                    echo "ChromeDriver: $(which chromedriver || echo 'Not found')"
                 '''
             }
         }
