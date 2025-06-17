@@ -183,7 +183,7 @@ pipeline {
                         ls -la /tmp/*.png
                         echo "Screenshots available for debugging"
                     else
-                        echo "No screenshots generated"
+                        echo "No screenshots generated X"
                     fi
                     
                     # Show test directory
