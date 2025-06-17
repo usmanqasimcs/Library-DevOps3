@@ -46,9 +46,9 @@ class LibraryManagementSystemTests(unittest.TestCase):
         
         # Test configuration - will be updated by Jenkins
         cls.BASE_URL = "http://localhost:4000"  # Jenkins will update this
-        cls.TEST_EMAIL = "usmanqasim073@gmail.com"
-        cls.TEST_PASSWORD = "usmanqasim073"
-        cls.TEST_NAME = "Usman Qasim"
+        cls.TEST_EMAIL = "peterparker@gmail.com"
+        cls.TEST_PASSWORD = "peterparker"
+        cls.TEST_NAME = "Miles Morales"
         
         print(f"✓ Test URL: {cls.BASE_URL}")
         print(f"✓ Test User: {cls.TEST_EMAIL}")
