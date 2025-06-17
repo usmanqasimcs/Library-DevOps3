@@ -1,8 +1,11 @@
 
 #!/bin/bash
 
+# Navigate to tests directory
+cd "$(dirname "$0")"
+
 # Install dependencies
-pip3 install -r tests/requirements.txt
+pip3 install -r requirements.txt
 
 # Install Chrome and ChromeDriver if not present
 if ! command -v google-chrome &> /dev/null; then
@@ -18,9 +21,26 @@ if ! command -v chromedriver &> /dev/null; then
     sudo apt-get install -y chromium-chromedriver
 fi
 
-# Run the tests
 echo "Running Digital Library Tests..."
-python3 -m pytest tests/test_library.py -v --tb=short
+echo "================================"
 
-# Alternative: Run with unittest
-# python3 tests/test_library.py
+# Option 1: Run all tests together using the test runner
+python3 run_all_tests.py
+
+echo ""
+echo "================================"
+echo "Running individual test files..."
+echo "================================"
+
+# Option 2: Run each test file individually (as requested by teacher)
+for test_file in test_*.py; do
+    if [ "$test_file" != "test_*.py" ]; then  # Check if files actually exist
+        echo ""
+        echo "Running $test_file..."
+        echo "------------------------"
+        python3 "$test_file" -v
+    fi
+done
+
+echo ""
+echo "All tests completed!"

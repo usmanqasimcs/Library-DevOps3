@@ -85,12 +85,22 @@ pipeline {
                             sudo apt-get install -y chromium-chromedriver
                         fi
                         
-                        # Update the test configuration with local URL
-                        sed -i 's|http://your-ec2-ip:port|http://localhost:4000|g' tests/test_library.py
+                        # Update the base test configuration with local URL
+                        sed -i 's|http://your-ec2-instance-ip:port|http://localhost:4000|g' tests/base_test.py
                         
-                        # Run the tests
+                        # Run all tests using the test runner
                         echo "Starting Selenium tests..."
-                        python3 -m pytest tests/test_library.py -v --tb=short || true
+                        cd tests
+                        python3 run_all_tests.py || true
+                        
+                        # Also run individual tests for detailed output
+                        echo "Running individual test files..."
+                        for test_file in test_*.py; do
+                            if [ "$test_file" != "test_*.py" ] && [ "$test_file" != "run_all_tests.py" ]; then
+                                echo "Running $test_file..."
+                                python3 "$test_file" || true
+                            fi
+                        done
                     '''
                 }
             }
