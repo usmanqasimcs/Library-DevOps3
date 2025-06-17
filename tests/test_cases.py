@@ -603,8 +603,7 @@ def run_selenium_test_suite():
     minutes = int(execution_time // 60)
     seconds = int(execution_time % 60)
 
-    print("👨‍🎓 - Muhammad Usman Qasim | SP22-BCS-073")
-    print("\033[1m👨‍🎓 - Muhammad Usman Qasim | SP22-BCS-073\033[0m")
+    print("\n\n\033[1m👨‍🎓 - Muhammad Usman Qasim | SP22-BCS-073\033[0m")
     print(f"\n⏱️ Total Execution Time: {minutes}m {seconds}s")
     print("🎯 - Testing: ✅ COMPLETED")
     print("   - Selenium WebDriver: ✅")
