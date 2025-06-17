@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        // Store the committer email globally
+        COMMITTER_EMAIL = ""
+    }
+
     stages {
         stage('delete php folder if it exists') {
             steps {
@@ -17,6 +22,20 @@ pipeline {
         stage('Fetch code') {
             steps {
                 sh 'git clone https://github.com/usmanqasimcs/Library-DevOps3.git /var/lib/jenkins/DevOps/php/'
+            }
+        }
+        stage('Get Committer Email') {
+            steps {
+                dir('/var/lib/jenkins/DevOps/php/') {
+                    script {
+                        // Extract committer email from the latest commit
+                        env.COMMITTER_EMAIL = sh(
+                            script: "git log -1 --pretty=format:'%ae' | tr -d \"'\"",
+                            returnStdout: true
+                        ).trim()
+                        echo "Committer Email: ${env.COMMITTER_EMAIL}"
+                    }
+                }
             }
         }
         stage('Set JWT Secret') {
@@ -64,7 +83,7 @@ pipeline {
                         pip3 install --break-system-packages selenium==4.15.0 webdriver-manager==4.0.1
                         export PATH=$PATH:$HOME/.local/bin
                         cd tests
-                        python3 test_library_complete.py || echo "Selenium tests completed with some failures"
+                        python3 test_library_complete.py > ../selenium_test_result.txt 2>&1 || echo "Selenium tests completed with some failures"
                     '''
                 }
             }
@@ -83,11 +102,35 @@ pipeline {
                 '''
             }
         }
-        failure {
-            echo '❌ Pipeline failed! Check the console output for Selenium test details.'
-        }
         success {
-            echo '✅ Pipeline completed successfully! Selenium tests executed with WebDriver automation.'
+            script {
+                echo '✅ Pipeline completed successfully! Selenium tests executed with WebDriver automation.'
+                if (env.COMMITTER_EMAIL?.trim()) {
+                    emailext(
+                        subject: "Library-DevOps3 Jenkins Test Results",
+                        body: "Hello,\n\nPlease find attached the test results for your recent commit to Library-DevOps3.\n\nRegards,\nJenkins",
+                        to: "${env.COMMITTER_EMAIL}",
+                        attachmentsPattern: '/var/lib/jenkins/DevOps/php/selenium_test_result.txt'
+                    )
+                } else {
+                    echo "Committer email not found, not sending email."
+                }
+            }
+        }
+        failure {
+            script {
+                echo '❌ Pipeline failed! Check the console output for Selenium test details.'
+                if (env.COMMITTER_EMAIL?.trim()) {
+                    emailext(
+                        subject: "Library-DevOps3 Jenkins Test Results (Failed)",
+                        body: "Hello,\n\nThe recent Jenkins pipeline run for your commit failed. Please find the test results attached.\n\nRegards,\nJenkins",
+                        to: "${env.COMMITTER_EMAIL}",
+                        attachmentsPattern: '/var/lib/jenkins/DevOps/php/selenium_test_result.txt'
+                    )
+                } else {
+                    echo "Committer email not found, not sending email."
+                }
+            }
         }
     }
 }
