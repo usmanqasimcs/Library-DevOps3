@@ -602,15 +602,17 @@ def run_selenium_test_suite():
     execution_time = end_time - start_time
     minutes = int(execution_time // 60)
     seconds = int(execution_time % 60)
-    
+
+    print("👨‍🎓 - Muhammad Usman Qasim | SP22-BCS-073")
+    print("\033[1m👨‍🎓 - Muhammad Usman Qasim | SP22-BCS-073\033[0m")
     print(f"\n⏱️ Total Execution Time: {minutes}m {seconds}s")
-    print("🎯 Assignment Requirements: ✅ COMPLETED")
-    print("   - Selenium WebDriver: ✅ Used")
-    print("   - Browser Automation: ✅ Implemented")
-    print("   - Multiple Test Cases: ✅ 10 Tests")
-    print("   - Element Interaction: ✅ Tested")
-    print("   - Form Submission: ✅ Tested")
-    print("   - Screenshot Capture: ✅ Implemented")
+    print("🎯 - Testing: ✅ COMPLETED")
+    print("   - Selenium WebDriver: ✅")
+    print("   - Browser Automation: ✅")
+    print("   - 10 Test Cases: ✅")
+    print("   - Element Interaction: ✅")
+    print("   - Form Submission: ✅")
+    print("   - Screenshot Capture: ✅")
     
     # Return appropriate exit code
     return 0 if result.wasSuccessful() else 1
