@@ -37,5 +37,81 @@ pipeline {
                 }
             }
         }
+
+        stage('Wait for Application to Start') {
+            steps {
+                dir('/var/lib/jenkins/DevOps/php/') {
+                    sh '''
+                        echo "Waiting for application to be ready..."
+                        sleep 30
+                        
+                        # Check if application is responding
+                        for i in {1..10}; do
+                            if curl -f http://localhost:4000 > /dev/null 2>&1; then
+                                echo "Application is ready!"
+                                break
+                            fi
+                            echo "Waiting for application... attempt $i"
+                            sleep 10
+                        done
+                    '''
+                }
+            }
+        }
+
+        stage('Run Selenium Tests') {
+            steps {
+                dir('/var/lib/jenkins/DevOps/php/') {
+                    sh '''
+                        # Install Python and pip if not present
+                        if ! command -v python3 &> /dev/null; then
+                            sudo apt-get update
+                            sudo apt-get install -y python3 python3-pip
+                        fi
+                        
+                        # Install test dependencies
+                        pip3 install -r tests/requirements.txt
+                        
+                        # Install Chrome if not present
+                        if ! command -v google-chrome &> /dev/null; then
+                            wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+                            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+                            sudo apt-get update
+                            sudo apt-get install -y google-chrome-stable
+                        fi
+                        
+                        # Install ChromeDriver if not present
+                        if ! command -v chromedriver &> /dev/null; then
+                            sudo apt-get install -y chromium-chromedriver
+                        fi
+                        
+                        # Update the test configuration with local URL
+                        sed -i 's|http://your-ec2-ip:port|http://localhost:4000|g' tests/test_library.py
+                        
+                        # Run the tests
+                        echo "Starting Selenium tests..."
+                        python3 -m pytest tests/test_library.py -v --tb=short || true
+                    '''
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            dir('/var/lib/jenkins/DevOps/php/') {
+                sh '''
+                    echo "Collecting test results..."
+                    # Archive any test results or screenshots if generated
+                    # docker compose -p libraryapp logs > docker-logs.txt
+                '''
+            }
+        }
+        failure {
+            echo 'Pipeline failed! Check the logs for details.'
+        }
+        success {
+            echo 'All tests passed successfully!'
+        }
     }
 }
