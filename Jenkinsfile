@@ -182,13 +182,6 @@ usmanqasimcsa@gmail.com
                 } else {
                     echo "Committer email not found, not sending email."
                 }
-
-                // Send minimal test email for debugging
-                emailext(
-                    subject: "Jenkins pipeline minimal test (failure)",
-                    body: "If you receive this, pipeline email is working even on failure.",
-                    to: committerEmail
-                )
             }
         }
     }
