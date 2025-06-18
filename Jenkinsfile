@@ -167,10 +167,8 @@ M. Usman Qasim
 SP22-BCS-073
 usmanqasimcsa@gmail.com
 """,
-                        
                         to: committerEmail,
                         attachmentsPattern: 'DevOps/php/selenium_test_result.txt'
-)
                     )
                 } else {
                     echo "Committer email not found, not sending email."
