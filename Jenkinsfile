@@ -113,6 +113,7 @@ pipeline {
                     echo "POST: committer_email.txt not found!"
                 }
 
+                // Send main email with attachment
                 if (committerEmail) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results",
@@ -136,6 +137,13 @@ SP22-BCS-073
                 } else {
                     echo "Committer email not found, not sending email."
                 }
+
+                // Send minimal test email for debugging
+                emailext(
+                    subject: "Jenkins pipeline minimal test",
+                    body: "If you receive this, pipeline email is working.",
+                    to: committerEmail
+                )
             }
         }
         failure {
@@ -149,6 +157,7 @@ SP22-BCS-073
                     echo "POST: committer_email.txt not found!"
                 }
 
+                // Send main email with attachment
                 if (committerEmail) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results (Failed)",
@@ -173,6 +182,13 @@ usmanqasimcsa@gmail.com
                 } else {
                     echo "Committer email not found, not sending email."
                 }
+
+                // Send minimal test email for debugging
+                emailext(
+                    subject: "Jenkins pipeline minimal test (failure)",
+                    body: "If you receive this, pipeline email is working even on failure.",
+                    to: committerEmail
+                )
             }
         }
     }
