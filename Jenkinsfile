@@ -113,11 +113,17 @@ pipeline {
                     echo "POST: committer_email.txt not found!"
                 }
 
-                // Send main email with attachment
-                if (committerEmail) {
-                    emailext(
-                        subject: "Library-DevOps3 Jenkins Test Results",
-                        body: """M. Usman Qasim
+                // Try to attach, if not found/readable, paste contents in the email body
+                def testResultsPath = "DevOps/php/selenium_test_result.txt"
+                def testResults = ""
+                boolean fileAttached = false
+                if (fileExists(testResultsPath)) {
+                    try {
+                        testResults = readFile(testResultsPath)
+                        // Try sending with attachment first
+                        emailext(
+                            subject: "Library-DevOps3 Jenkins Test Results",
+                            body: """M. Usman Qasim
 SP22-BCS-073
 
 Dear Contributor,
@@ -131,19 +137,42 @@ Best regards,
 M. Usman Qasim
 SP22-BCS-073
 """,
-                        to: committerEmail,
-                        attachmentsPattern: 'DevOps/php/selenium_test_result.txt'
-                    )
-                } else {
-                    echo "Committer email not found, not sending email."
+                            to: committerEmail,
+                            attachmentsPattern: testResultsPath
+                        )
+                        fileAttached = true
+                    } catch (all) {
+                        fileAttached = false
+                    }
                 }
+                // If attachment failed or file is missing, send results in body
+                if (!fileAttached) {
+                    String resultsText = testResults ? testResults : "No test results found."
+                    emailext(
+                        subject: "Library-DevOps3 Jenkins Test Results",
+                        body: """M. Usman Qasim
+SP22-BCS-073
 
-                // Send minimal test email for debugging
-                emailext(
-                    subject: "Jenkins pipeline minimal test",
-                    body: "If you receive this, pipeline email is working.",
-                    to: committerEmail
-                )
+Dear Contributor,
+
+Your recent commit to the Library-DevOps3 project has been tested automatically by my Jenkins CI pipeline.
+
+Thank you for your guidance Sir!
+
+Best regards,
+M. Usman Qasim
+SP22-BCS-073
+
+---
+
+Selenium Test Results:
+---------------------------------------------------------
+${resultsText}
+---------------------------------------------------------
+""",
+                        to: committerEmail
+                    )
+                }
             }
         }
         failure {
@@ -157,11 +186,15 @@ SP22-BCS-073
                     echo "POST: committer_email.txt not found!"
                 }
 
-                // Send main email with attachment
-                if (committerEmail) {
-                    emailext(
-                        subject: "Library-DevOps3 Jenkins Test Results (Failed)",
-                        body: """M. Usman Qasim
+                def testResultsPath = "DevOps/php/selenium_test_result.txt"
+                def testResults = ""
+                boolean fileAttached = false
+                if (fileExists(testResultsPath)) {
+                    try {
+                        testResults = readFile(testResultsPath)
+                        emailext(
+                            subject: "Library-DevOps3 Jenkins Test Results (Failed)",
+                            body: """M. Usman Qasim
 SP22-BCS-073
 
 Dear Contributor,
@@ -176,11 +209,41 @@ M. Usman Qasim
 SP22-BCS-073
 usmanqasimcsa@gmail.com
 """,
-                        to: committerEmail,
-                        attachmentsPattern: 'DevOps/php/selenium_test_result.txt'
+                            to: committerEmail,
+                            attachmentsPattern: testResultsPath
+                        )
+                        fileAttached = true
+                    } catch (all) {
+                        fileAttached = false
+                    }
+                }
+                if (!fileAttached) {
+                    String resultsText = testResults ? testResults : "No test results found."
+                    emailext(
+                        subject: "Library-DevOps3 Jenkins Test Results (Failed)",
+                        body: """M. Usman Qasim
+SP22-BCS-073
+
+Dear Contributor,
+
+Your recent commit to the Library-DevOps3 project has been tested automatically by my Jenkins CI pipeline.
+
+Thank you for your guidance Sir!
+
+Best regards,
+M. Usman Qasim
+SP22-BCS-073
+usmanqasimcsa@gmail.com
+
+---
+
+Selenium Test Results:
+---------------------------------------------------------
+${resultsText}
+---------------------------------------------------------
+""",
+                        to: committerEmail
                     )
-                } else {
-                    echo "Committer email not found, not sending email."
                 }
             }
         }
