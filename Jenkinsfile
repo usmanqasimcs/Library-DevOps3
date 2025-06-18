@@ -94,15 +94,6 @@ pipeline {
     }
     post {
         always {
-            script {
-                def emailFile = "${env.WORKSPACE}/committer_email.txt"
-                if (fileExists(emailFile)) {
-                    env.COMMITTER_EMAIL = readFile(emailFile).trim()
-                    echo "POST: Read committer email: [${env.COMMITTER_EMAIL}]"
-                } else {
-                    echo "POST: committer_email.txt not found!"
-                }
-            }
             dir('/var/lib/jenkins/DevOps/php/') {
                 sh '''
                     echo "📊 Application Status:"
@@ -117,6 +108,15 @@ pipeline {
         }
         success {
             script {
+                // Read committer email from file in post block
+                def emailFile = "${env.WORKSPACE}/committer_email.txt"
+                if (fileExists(emailFile)) {
+                    env.COMMITTER_EMAIL = readFile(emailFile).trim()
+                    echo "POST: Read committer email: [${env.COMMITTER_EMAIL}]"
+                } else {
+                    echo "POST: committer_email.txt not found!"
+                }
+
                 echo '✅ Pipeline completed successfully! Selenium tests executed with WebDriver automation.'
                 if (env.COMMITTER_EMAIL?.trim()) {
                     emailext(
@@ -147,6 +147,15 @@ SP22-BCS-073
         }
         failure {
             script {
+                // Read committer email from file in post block
+                def emailFile = "${env.WORKSPACE}/committer_email.txt"
+                if (fileExists(emailFile)) {
+                    env.COMMITTER_EMAIL = readFile(emailFile).trim()
+                    echo "POST: Read committer email: [${env.COMMITTER_EMAIL}]"
+                } else {
+                    echo "POST: committer_email.txt not found!"
+                }
+
                 echo '❌ Pipeline failed! Check the console output for Selenium test details.'
                 if (env.COMMITTER_EMAIL?.trim()) {
                     emailext(
