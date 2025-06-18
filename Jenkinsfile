@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Store the committer email globally
         COMMITTER_EMAIL = ""
     }
 
@@ -24,10 +23,10 @@ pipeline {
                 sh 'git clone https://github.com/usmanqasimcs/Library-DevOps3.git /var/lib/jenkins/DevOps/php/'
             }
         }
+        // THIS STAGE MUST RUN IN WORKSPACE, NOT IN dir()!
         stage('Get Committer Email') {
             steps {
                 script {
-                    // Use Jenkins workspace, which has the latest commit info
                     env.COMMITTER_EMAIL = sh(
                         script: "git log -1 --pretty=format:'%ae' | tr -d \"'\"",
                         returnStdout: true
@@ -36,6 +35,7 @@ pipeline {
                 }
             }
         }
+        // ... rest of your stages ...
         stage('Set JWT Secret') {
             steps {
                 dir('/var/lib/jenkins/DevOps/php/') {
