@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('delete old folder if it exists') {
+        stage('Cleanup DevOps Folder') {
             steps {
                 sh '''
                     if [ -d "/var/lib/jenkins/DevOps/" ]; then
@@ -18,7 +18,7 @@ pipeline {
                 '''
             }
         }
-        stage('Fetch code') {
+        stage('Fetch Code') {
             steps {
                 sh 'git clone https://github.com/usmanqasimcs/Library-DevOps3.git /var/lib/jenkins/DevOps/php/'
             }
@@ -27,11 +27,16 @@ pipeline {
             steps {
                 dir('/var/lib/jenkins/DevOps/php') {
                     script {
-                        env.COMMITTER_EMAIL = sh(
+                        def result = sh(
                             script: "git log -1 --pretty=format:%ae",
                             returnStdout: true
-                        ).trim()
-                        echo "Committer Email: ${env.COMMITTER_EMAIL}"
+                        )
+                        echo "Raw committer email from git log: [${result}]"
+                        env.COMMITTER_EMAIL = result.trim()
+                        echo "Trimmed committer email used: [${env.COMMITTER_EMAIL}]"
+                        if (!env.COMMITTER_EMAIL) {
+                            echo "DEBUG: The committer email is empty!"
+                        }
                     }
                 }
             }
@@ -86,6 +91,13 @@ pipeline {
                 }
             }
         }
+        stage('Show Selenium Test Results') {
+            steps {
+                dir('/var/lib/jenkins/DevOps/php/') {
+                    sh 'cat selenium_test_result.txt || echo "No test results found."'
+                }
+            }
+        }
     }
     post {
         always {
@@ -98,6 +110,7 @@ pipeline {
                     echo "📸 Test Screenshots:"
                     ls -la /tmp/*.png 2>/dev/null || echo "No screenshots generated"
                 '''
+                archiveArtifacts artifacts: 'selenium_test_result.txt', onlyIfSuccessful: false
             }
         }
         success {
