@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        COMMITTER_EMAIL = ""
-    }
-
     stages {
         stage('Cleanup DevOps Folder') {
             steps {
@@ -108,17 +104,16 @@ pipeline {
         }
         success {
             script {
-                // Read committer email from file in post block
                 def emailFile = "${env.WORKSPACE}/committer_email.txt"
+                def committerEmail = ""
                 if (fileExists(emailFile)) {
-                    env.COMMITTER_EMAIL = readFile(emailFile).trim()
-                    echo "POST: Read committer email: [${env.COMMITTER_EMAIL}]"
+                    committerEmail = readFile(emailFile).trim()
+                    echo "POST: Read committer email: [${committerEmail}]"
                 } else {
                     echo "POST: committer_email.txt not found!"
                 }
 
-                echo '✅ Pipeline completed successfully! Selenium tests executed with WebDriver automation.'
-                if (env.COMMITTER_EMAIL?.trim()) {
+                if (committerEmail) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results",
                         body: """M. Usman Qasim
@@ -126,18 +121,16 @@ SP22-BCS-073
 
 Dear Contributor,
 
-Your recent commit to the Library-DevOps3 project has been tested automatically by our Jenkins CI pipeline.  
-Please find the attached file containing the complete Selenium test results for your submission.
+Your recent commit to the Library-DevOps3 project has been tested automatically by my Jenkins CI pipeline.  
+Please find the attached file containing the complete Selenium test results.
 
-If you have any questions or need further assistance, feel free to reach out.
-
-Thank you for your contribution!
+Thank you for your guidance Sir!
 
 Best regards,
 M. Usman Qasim
 SP22-BCS-073
 """,
-                        to: "${env.COMMITTER_EMAIL}",
+                        to: committerEmail,
                         attachmentsPattern: '/var/lib/jenkins/DevOps/php/selenium_test_result.txt'
                     )
                 } else {
@@ -147,17 +140,16 @@ SP22-BCS-073
         }
         failure {
             script {
-                // Read committer email from file in post block
                 def emailFile = "${env.WORKSPACE}/committer_email.txt"
+                def committerEmail = ""
                 if (fileExists(emailFile)) {
-                    env.COMMITTER_EMAIL = readFile(emailFile).trim()
-                    echo "POST: Read committer email: [${env.COMMITTER_EMAIL}]"
+                    committerEmail = readFile(emailFile).trim()
+                    echo "POST: Read committer email: [${committerEmail}]"
                 } else {
                     echo "POST: committer_email.txt not found!"
                 }
 
-                echo '❌ Pipeline failed! Check the console output for Selenium test details.'
-                if (env.COMMITTER_EMAIL?.trim()) {
+                if (committerEmail) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results (Failed)",
                         body: """M. Usman Qasim
@@ -175,7 +167,7 @@ M. Usman Qasim
 SP22-BCS-073
 usmanqasimcsa@gmail.com
 """,
-                        to: "${env.COMMITTER_EMAIL}",
+                        to: committerEmail,
                         attachmentsPattern: '/var/lib/jenkins/DevOps/php/selenium_test_result.txt'
                     )
                 } else {
