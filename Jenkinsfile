@@ -27,13 +27,9 @@ pipeline {
             steps {
                 dir('/var/lib/jenkins/DevOps/php') {
                     script {
-                        def result = sh(
-                            script: "git log -1 --pretty=format:%ae",
-                            returnStdout: true
-                        ).trim()
-                        echo "Raw committer email from git log: [${result}]"
-                        // Ensure string assignment, never null
-                        env.COMMITTER_EMAIL = (result ?: "").toString().trim()
+                        def committer = sh(script: "git log -1 --pretty=format:%ae", returnStdout: true).trim()
+                        echo "Raw committer email from git log: [${committer}]"
+                        env.COMMITTER_EMAIL = committer
                         echo "Trimmed committer email used: [${env.COMMITTER_EMAIL}]"
                         if (!env.COMMITTER_EMAIL) {
                             echo "DEBUG: The committer email is empty!"
@@ -117,10 +113,25 @@ pipeline {
         success {
             script {
                 echo '✅ Pipeline completed successfully! Selenium tests executed with WebDriver automation.'
-                if (env.COMMITTER_EMAIL) {
+                if (env.COMMITTER_EMAIL?.trim()) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results",
-                        body: "Hello,\n\nPlease find attached the test results for your recent commit to Library-DevOps3.\n\nRegards,\nJenkins",
+                        body: """M. Usman Qasim
+SP22-BCS-073
+
+Dear Contributor,
+
+Your recent commit to the Library-DevOps3 project has been tested automatically by our Jenkins CI pipeline.  
+Please find the attached file containing the complete Selenium test results for your submission.
+
+If you have any questions or need further assistance, feel free to reach out.
+
+Thank you for your contribution!
+
+Best regards,
+M. Usman Qasim
+SP22-BCS-073
+""",
                         to: "${env.COMMITTER_EMAIL}",
                         attachmentsPattern: '/var/lib/jenkins/DevOps/php/selenium_test_result.txt'
                     )
@@ -132,10 +143,24 @@ pipeline {
         failure {
             script {
                 echo '❌ Pipeline failed! Check the console output for Selenium test details.'
-                if (env.COMMITTER_EMAIL) {
+                if (env.COMMITTER_EMAIL?.trim()) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results (Failed)",
-                        body: "Hello,\n\nThe recent Jenkins pipeline run for your commit failed. Please find the test results attached.\n\nRegards,\nJenkins",
+                        body: """M. Usman Qasim
+SP22-BCS-073
+
+Dear Contributor,
+
+Your recent commit to the Library-DevOps3 project has been tested automatically by my Jenkins CI pipeline.  
+Please find the attached file containing the complete Selenium test results.
+
+Thank you for your guidance Sir!
+
+Best regards,
+M. Usman Qasim
+SP22-BCS-073
+usmanqasimcsa@gmail.com
+""",
                         to: "${env.COMMITTER_EMAIL}",
                         attachmentsPattern: '/var/lib/jenkins/DevOps/php/selenium_test_result.txt'
                     )
