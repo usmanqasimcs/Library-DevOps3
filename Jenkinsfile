@@ -39,7 +39,7 @@ pipeline {
         }
         stage('Build and Start Docker Compose') {
             steps {
-                dir('/var/lib/jenkins/DevOps/php/') {
+                dir('/var/lib/jenkins/Devops/php/') {
                     sh 'docker compose -p libraryapp up -d --build'
                 }
             }
@@ -75,52 +75,36 @@ pipeline {
                         pip3 install --break-system-packages selenium==4.15.0 webdriver-manager==4.0.1
                         export PATH=$PATH:$HOME/.local/bin
                         cd tests
-                        python3 test_cases.py > ../selenium_test_result.txt 2>&1 || echo "Selenium tests completed with some failures"
+                        python3 test_cases.py > $WORKSPACE/selenium_test_result.txt 2>&1 || echo "Selenium tests completed with some failures"
                     '''
                 }
             }
         }
         stage('Show Selenium Test Results') {
             steps {
-                dir('/var/lib/jenkins/DevOps/php/') {
-                    sh 'cat selenium_test_result.txt || echo "No test results found."'
+                script {
+                    if (fileExists("${env.WORKSPACE}/selenium_test_result.txt")) {
+                        sh "cat ${env.WORKSPACE}/selenium_test_result.txt"
+                    } else {
+                        echo "No test results found."
+                    }
                 }
             }
         }
     }
     post {
         always {
-            dir('/var/lib/jenkins/DevOps/php/') {
-                sh '''
-                    echo "📊 Application Status:"
-                    docker compose -p libraryapp ps
-                    echo "📁 Test Directory Contents:"
-                    ls -la tests/
-                    echo "📸 Test Screenshots:"
-                    ls -la /tmp/*.png 2>/dev/null || echo "No screenshots generated"
-                '''
-                archiveArtifacts artifacts: 'selenium_test_result.txt', onlyIfSuccessful: false
-            }
+            archiveArtifacts artifacts: 'selenium_test_result.txt', onlyIfSuccessful: false
         }
         success {
             script {
                 def emailFile = "${env.WORKSPACE}/committer_email.txt"
-                def committerEmail = ""
-                if (fileExists(emailFile)) {
-                    committerEmail = readFile(emailFile).trim()
-                    echo "POST: Read committer email: [${committerEmail}]"
-                } else {
-                    echo "POST: committer_email.txt not found!"
-                }
-
-                // Try to attach, if not found/readable, paste contents in the email body
-                def testResultsPath = "DevOps/php/selenium_test_result.txt"
-                def testResults = ""
-                boolean fileAttached = false
+                def committerEmail = fileExists(emailFile) ? readFile(emailFile).trim() : ""
+                def testResultsPath = "${env.WORKSPACE}/selenium_test_result.txt"
+                def testResults = fileExists(testResultsPath) ? readFile(testResultsPath) : "No test results found."
+                boolean attached = false
                 if (fileExists(testResultsPath)) {
                     try {
-                        testResults = readFile(testResultsPath)
-                        // Try sending with attachment first
                         emailext(
                             subject: "Library-DevOps3 Jenkins Test Results",
                             body: """M. Usman Qasim
@@ -138,16 +122,12 @@ M. Usman Qasim
 SP22-BCS-073
 """,
                             to: committerEmail,
-                            attachmentsPattern: testResultsPath
+                            attachmentsPattern: 'selenium_test_result.txt'
                         )
-                        fileAttached = true
-                    } catch (all) {
-                        fileAttached = false
-                    }
+                        attached = true
+                    } catch (all) { attached = false }
                 }
-                // If attachment failed or file is missing, send results in body
-                if (!fileAttached) {
-                    String resultsText = testResults ? testResults : "No test results found."
+                if (!attached) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results",
                         body: """M. Usman Qasim
@@ -167,7 +147,7 @@ SP22-BCS-073
 
 Selenium Test Results:
 ---------------------------------------------------------
-${resultsText}
+${testResults}
 ---------------------------------------------------------
 """,
                         to: committerEmail
@@ -178,20 +158,12 @@ ${resultsText}
         failure {
             script {
                 def emailFile = "${env.WORKSPACE}/committer_email.txt"
-                def committerEmail = ""
-                if (fileExists(emailFile)) {
-                    committerEmail = readFile(emailFile).trim()
-                    echo "POST: Read committer email: [${committerEmail}]"
-                } else {
-                    echo "POST: committer_email.txt not found!"
-                }
-
-                def testResultsPath = "DevOps/php/selenium_test_result.txt"
-                def testResults = ""
-                boolean fileAttached = false
+                def committerEmail = fileExists(emailFile) ? readFile(emailFile).trim() : ""
+                def testResultsPath = "${env.WORKSPACE}/selenium_test_result.txt"
+                def testResults = fileExists(testResultsPath) ? readFile(testResultsPath) : "No test results found."
+                boolean attached = false
                 if (fileExists(testResultsPath)) {
                     try {
-                        testResults = readFile(testResultsPath)
                         emailext(
                             subject: "Library-DevOps3 Jenkins Test Results (Failed)",
                             body: """M. Usman Qasim
@@ -210,15 +182,12 @@ SP22-BCS-073
 usmanqasimcsa@gmail.com
 """,
                             to: committerEmail,
-                            attachmentsPattern: testResultsPath
+                            attachmentsPattern: 'selenium_test_result.txt'
                         )
-                        fileAttached = true
-                    } catch (all) {
-                        fileAttached = false
-                    }
+                        attached = true
+                    } catch (all) { attached = false }
                 }
-                if (!fileAttached) {
-                    String resultsText = testResults ? testResults : "No test results found."
+                if (!attached) {
                     emailext(
                         subject: "Library-DevOps3 Jenkins Test Results (Failed)",
                         body: """M. Usman Qasim
@@ -239,7 +208,7 @@ usmanqasimcsa@gmail.com
 
 Selenium Test Results:
 ---------------------------------------------------------
-${resultsText}
+${testResults}
 ---------------------------------------------------------
 """,
                         to: committerEmail
