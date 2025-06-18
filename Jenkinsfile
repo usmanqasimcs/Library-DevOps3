@@ -26,15 +26,13 @@ pipeline {
         }
         stage('Get Committer Email') {
             steps {
-                dir('/var/lib/jenkins/DevOps/php/') {
-                    script {
-                        // Extract committer email from the latest commit
-                        env.COMMITTER_EMAIL = sh(
-                            script: "git log -1 --pretty=format:'%ae' | tr -d \"'\"",
-                            returnStdout: true
-                        ).trim()
-                        echo "Committer Email: ${env.COMMITTER_EMAIL}"
-                    }
+                script {
+                    // Use Jenkins workspace, which has the latest commit info
+                    env.COMMITTER_EMAIL = sh(
+                        script: "git log -1 --pretty=format:'%ae' | tr -d \"'\"",
+                        returnStdout: true
+                    ).trim()
+                    echo "Committer Email: ${env.COMMITTER_EMAIL}"
                 }
             }
         }
