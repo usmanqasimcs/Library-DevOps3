@@ -23,10 +23,10 @@ pipeline {
                 sh 'git clone https://github.com/usmanqasimcs/Library-DevOps3.git /var/lib/jenkins/DevOps/php/'
             }
         }
-        // THIS STAGE MUST RUN IN WORKSPACE, NOT IN dir()!
         stage('Get Committer Email') {
             steps {
                 script {
+                    // This MUST run in Jenkins workspace to get the right commit info!
                     env.COMMITTER_EMAIL = sh(
                         script: "git log -1 --pretty=format:'%ae' | tr -d \"'\"",
                         returnStdout: true
@@ -35,7 +35,6 @@ pipeline {
                 }
             }
         }
-        // ... rest of your stages ...
         stage('Set JWT Secret') {
             steps {
                 dir('/var/lib/jenkins/DevOps/php/') {
