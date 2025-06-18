@@ -26,15 +26,11 @@ pipeline {
         stage('Get Committer Email') {
             steps {
                 dir('/var/lib/jenkins/DevOps/php') {
-                    script {
-                        def committer = sh(script: "git log -1 --pretty=format:%ae", returnStdout: true).trim()
-                        echo "Raw committer email from git log: [${committer}]"
-                        env.COMMITTER_EMAIL = committer
-                        echo "Trimmed committer email used: [${env.COMMITTER_EMAIL}]"
-                        if (!env.COMMITTER_EMAIL) {
-                            echo "DEBUG: The committer email is empty!"
-                        }
-                    }
+                    sh '''
+                        git log -1 --pretty=format:%ae | tr -d '\\n' > $WORKSPACE/committer_email.txt
+                        echo "Saved committer email:"
+                        cat $WORKSPACE/committer_email.txt
+                    '''
                 }
             }
         }
@@ -98,6 +94,15 @@ pipeline {
     }
     post {
         always {
+            script {
+                def emailFile = "${env.WORKSPACE}/committer_email.txt"
+                if (fileExists(emailFile)) {
+                    env.COMMITTER_EMAIL = readFile(emailFile).trim()
+                    echo "POST: Read committer email: [${env.COMMITTER_EMAIL}]"
+                } else {
+                    echo "POST: committer_email.txt not found!"
+                }
+            }
             dir('/var/lib/jenkins/DevOps/php/') {
                 sh '''
                     echo "📊 Application Status:"
