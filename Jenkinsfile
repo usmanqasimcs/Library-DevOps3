@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('delete php folder if it exists') {
+        stage('delete old folder if it exists') {
             steps {
                 sh '''
                     if [ -d "/var/lib/jenkins/DevOps/" ]; then
