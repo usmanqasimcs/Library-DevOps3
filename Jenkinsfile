@@ -32,9 +32,10 @@ pipeline {
                             returnStdout: true
                         )
                         echo "Raw committer email from git log: [${result}]"
-                        env.COMMITTER_EMAIL = result.trim()
+                        // Fix: Always assign as string & trim
+                        env.COMMITTER_EMAIL = "${result}".trim()
                         echo "Trimmed committer email used: [${env.COMMITTER_EMAIL}]"
-                        if (!env.COMMITTER_EMAIL) {
+                        if (!env.COMMITTER_EMAIL?.trim()) {
                             echo "DEBUG: The committer email is empty!"
                         }
                     }
@@ -86,7 +87,7 @@ pipeline {
                         pip3 install --break-system-packages selenium==4.15.0 webdriver-manager==4.0.1
                         export PATH=$PATH:$HOME/.local/bin
                         cd tests
-                        python3 test_library_complete.py > ../selenium_test_result.txt 2>&1 || echo "Selenium tests completed with some failures"
+                        python3 test_cases.py > ../selenium_test_result.txt 2>&1 || echo "Selenium tests completed with some failures"
                     '''
                 }
             }
