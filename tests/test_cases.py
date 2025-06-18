@@ -120,15 +120,15 @@ class LibrarySeleniumTests(unittest.TestCase):
             print(f"Success Rate: {success_rate:.1f}%")
             
             if success_rate >= 80:
-                print("🎉 EXCELLENT: Assignment requirements fulfilled!")
+                print("🎉 Assignment requirements fulfilled!")
             elif success_rate >= 60:
-                print("✅ GOOD: Most tests passed successfully!")
+                print("✅ Most tests passed successfully!")
             else:
-                print("⚠️ NEEDS IMPROVEMENT: Some tests need attention")
+                print("⚠️ Some tests need attention")
         
         print("="*70)
         print("✅ SELENIUM WEBDRIVER TESTING COMPLETED")
-        print("Assignment: Automated browser testing with Selenium ✓")
+        print("Automated browser testing with Selenium ✓")
         print("="*70)
 
     def setUp(self):
