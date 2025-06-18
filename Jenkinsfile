@@ -26,9 +26,8 @@ pipeline {
         stage('Get Committer Email') {
             steps {
                 script {
-                    // This MUST run in Jenkins workspace to get the right commit info!
                     env.COMMITTER_EMAIL = sh(
-                        script: "git log -1 --pretty=format:'%ae' | tr -d \"'\"",
+                        script: "git log -1 --pretty=format:%ae",
                         returnStdout: true
                     ).trim()
                     echo "Committer Email: ${env.COMMITTER_EMAIL}"
